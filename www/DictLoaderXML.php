@@ -19,6 +19,7 @@ const S_ATTR_EL1      = 'el1';
 const S_ATTR_EL2      = 'el2';
 const S_NODE_COMMENT  = 'comment';
 const S_ATTR_PROFILE  = 'profile';
+const S_NODE_RATIO    = 'ratio';
 
 class DictLoaderXML extends DictLoader {
     protected $fileName = '';
@@ -27,6 +28,26 @@ class DictLoaderXML extends DictLoader {
     function __construct($fname) {
        $this->xml = NULL;
        $this->fileName = $fname;
+    }
+
+    private function load_basetypes(Dictionary $dict)
+    {
+        $dict->basetypes = Array();
+        // Lets find all the 'ratio' nodes
+        $elements = $this->xml->getElementsByTagName(S_NODE_RATIO);
+        if (!isset($elements)) {
+            throw new ErrorException(S_EXCEPTION_FILE_CORRUPTED . ' (node <' . S_NODE_RATIO . '> not found');
+        }
+        // <ratio property="1">...</ratio>
+        // filling $dict->basetypes
+        // $dict->basetypes[1] = ['F'=> 1, 'M' => 5, ...];
+        for ($i=0; $i < $elements->length; $i++) {
+            $elem = $elements->item($i);
+            // each node has single attribute "property", get its value
+            $propid = $elem->attributes->item(0)->nodeValue;
+            $data = Array();
+
+        }
     }
 
     private function load_comments(Dictionary $dict) {
@@ -174,8 +195,8 @@ class DictLoaderXML extends DictLoader {
         //$this->load_properties($dict);
         //$this->load_profiles($dict);
         //$this->load_risk($dict);
-        $this->load_comments($dict);
-
+        //$this->load_comments($dict);
+        $this->load_basetypes($dict);
 
     }
 }

@@ -29,6 +29,7 @@ class Dictionary {
     public $elements = Array();
     public $risk = Array();
     public $comments = Array();
+    public $basetypes = Array();
 
     public function Load(DictLoader $loader) {
         if (isset($loader)) {

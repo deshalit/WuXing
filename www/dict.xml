@@ -335,4 +335,279 @@
 		<comment el1="M" el2="T" profile="10"><![CDATA[В деловых отношениях предсказуем и надежен. Партнер, с которым можно договариваться, но не стоит ввязываться с ним в состязания за главенство и лидерство. Если вам это очень нужно доказывайте свою состоятельность делами, а не словами, ведь он поступает именно так. ]]></comment>
 		<comment el1="W" el2="T" profile="10"><![CDATA[В деловых отношениях способен проявлять отличную адаптивность, ответственность и "холодную голову". Сочетание среднего уровня толерантности и партнерства с конфликтностью выше среднего уровня указывает на жесткость в ситуациях, когда дело идет не так, как запланировано. Особенно это касается партнеров и в меньшей степени собственной команды.]]></comment>
 	</comments>
+	<basetypes>
+		<ratio property="1">
+			<value el="F">5</value>
+			<value el="E">3</value>
+			<value el="M">1</value>
+			<value el="W">2</value>
+			<value el="T">4</value>
+		</ratio>
+		<ratio property="2">
+			<value el="F">2</value>
+			<value el="E">1</value>
+			<value el="M">4</value>
+			<value el="W">4</value>
+			<value el="T">5</value>
+		</ratio>
+		<ratio property="3">
+			<value el="F">5</value>
+			<value el="E">4</value>
+			<value el="M">1</value>
+			<value el="W">2</value>
+			<value el="T">4</value>
+		</ratio>
+		<ratio property="4">
+			<value el="F">1</value>
+			<value el="E">4</value>
+			<value el="M">5</value>
+			<value el="W">3</value>
+			<value el="T">2</value>
+		</ratio>
+		<ratio property="5">
+			<value el="F">1</value>
+			<value el="E">3</value>
+			<value el="M">5</value>
+			<value el="W">3</value>
+			<value el="T">4</value>
+		</ratio>
+		<ratio property="6">
+			<value el="F">1</value>
+			<value el="E">3</value>
+			<value el="M">5</value>
+			<value el="W">2</value>
+			<value el="T">3</value>
+		</ratio>
+		<ratio property="7">
+			<value el="F">5</value>
+			<value el="E">3</value>
+			<value el="M">2</value>
+			<value el="W">1</value>
+			<value el="T">4</value>
+		</ratio>
+		<ratio property="8">
+			<value el="F">1</value>
+			<value el="E">3</value>
+			<value el="M">4</value>
+			<value el="W">5</value>
+			<value el="T">3</value>
+		</ratio>
+		<ratio property="9">
+			<value el="F">5</value>
+			<value el="E">2</value>
+			<value el="M">1</value>
+			<value el="W">3</value>
+			<value el="T">5</value>
+		</ratio>
+		<ratio property="10">
+			<value el="F">1</value>
+			<value el="E">4</value>
+			<value el="M">3</value>
+			<value el="W">5</value>
+			<value el="T">3</value>
+		</ratio>
+		<ratio property="11">
+			<value el="F">1</value>
+			<value el="E">4</value>
+			<value el="M">3</value>
+			<value el="W">5</value>
+			<value el="T">4</value>
+		</ratio>
+		<ratio property="12">
+			<value el="F">3</value>
+			<value el="E">4</value>
+			<value el="M">1</value>
+			<value el="W">5</value>
+			<value el="T">3</value>
+		</ratio>
+		<ratio property="13">
+			<value el="F">5</value>
+			<value el="E">1</value>
+			<value el="M">3</value>
+			<value el="W">2</value>
+			<value el="T">5</value>
+		</ratio>
+		<ratio property="14">
+			<value el="F">1</value>
+			<value el="E">4</value>
+			<value el="M">5</value>
+			<value el="W">3</value>
+			<value el="T">3</value>
+		</ratio>
+		<ratio property="15">
+			<value el="F">5</value>
+			<value el="E">2</value>
+			<value el="M">1</value>
+			<value el="W">3</value>
+			<value el="T">3</value>
+		</ratio>
+		<ratio property="16">
+			<value el="F">5</value>
+			<value el="E">3</value>
+			<value el="M">1</value>
+			<value el="W">5</value>
+			<value el="T">4</value>
+		</ratio>
+		<ratio property="17">
+			<value el="F">1</value>
+			<value el="E">2</value>
+			<value el="M">4</value>
+			<value el="W">3</value>
+			<value el="T">5</value>
+		</ratio>
+		<ratio property="18">
+			<value el="F">1</value>
+			<value el="E">5</value>
+			<value el="M">4</value>
+			<value el="W">3</value>
+			<value el="T">2</value>
+		</ratio>
+		<ratio property="19">
+			<value el="F">2</value>
+			<value el="E">5</value>
+			<value el="M">3</value>
+			<value el="W">2</value>
+			<value el="T">5</value>
+		</ratio>
+		<ratio property="20">
+			<value el="F">5</value>
+			<value el="E">2</value>
+			<value el="M">3</value>
+			<value el="W">4</value>
+			<value el="T">4</value>
+		</ratio>
+		<ratio property="21">
+			<value el="F">5</value>
+			<value el="E">1</value>
+			<value el="M">4</value>
+			<value el="W">2</value>
+			<value el="T">5</value>
+		</ratio>
+		<ratio property="22">
+			<value el="F">4</value>
+			<value el="E">1</value>
+			<value el="M">2</value>
+			<value el="W">3</value>
+			<value el="T">5</value>
+		</ratio>
+		<ratio property="23">
+			<value el="F">1</value>
+			<value el="E">2</value>
+			<value el="M">5</value>
+			<value el="W">3</value>
+			<value el="T">4</value>
+		</ratio>
+		<ratio property="24">
+			<value el="F">5</value>
+			<value el="E">3</value>
+			<value el="M">1</value>
+			<value el="W">3</value>
+			<value el="T">4</value>
+		</ratio>
+		<ratio property="25">
+			<value el="F">3</value>
+			<value el="E">2</value>
+			<value el="M">1</value>
+			<value el="W">5</value>
+			<value el="T">4</value>
+		</ratio>
+		<ratio property="26">
+			<value el="F">4</value>
+			<value el="E">3</value>
+			<value el="M">2</value>
+			<value el="W">1</value>
+			<value el="T">5</value>
+		</ratio>
+		<ratio property="27">
+			<value el="F">5</value>
+			<value el="E">4</value>
+			<value el="M">3</value>
+			<value el="W">2</value>
+			<value el="T">1</value>
+		</ratio>
+		<ratio property="28">
+			<value el="F">1</value>
+			<value el="E">5</value>
+			<value el="M">4</value>
+			<value el="W">3</value>
+			<value el="T">2</value>
+		</ratio>
+		<ratio property="29">
+			<value el="F">2</value>
+			<value el="E">1</value>
+			<value el="M">5</value>
+			<value el="W">4</value>
+			<value el="T">3</value>
+		</ratio>
+		<ratio property="30">
+			<value el="F">5</value>
+			<value el="E">1</value>
+			<value el="M">3</value>
+			<value el="W">2</value>
+			<value el="T">4</value>
+		</ratio>
+		<ratio property="31">
+			<value el="F">1</value>
+			<value el="E">4</value>
+			<value el="M">3</value>
+			<value el="W">5</value>
+			<value el="T">2</value>
+		</ratio>
+		<ratio property="32">
+			<value el="F">5</value>
+			<value el="E">3</value>
+			<value el="M">5</value>
+			<value el="W">1</value>
+			<value el="T">3</value>
+		</ratio>
+		<ratio property="33">
+			<value el="F">5</value>
+			<value el="E">4</value>
+			<value el="M">2</value>
+			<value el="W">1</value>
+			<value el="T">2</value>
+		</ratio>
+		<ratio property="34">
+			<value el="F">1</value>
+			<value el="E">2</value>
+			<value el="M">4</value>
+			<value el="W">3</value>
+			<value el="T">5</value>
+		</ratio>
+		<ratio property="35">
+			<value el="F">1</value>
+			<value el="E">5</value>
+			<value el="M">4</value>
+			<value el="W">2</value>
+			<value el="T">3</value>
+		</ratio>
+		<ratio property="36">
+			<value el="F">5</value>
+			<value el="E">2</value>
+			<value el="M">1</value>
+			<value el="W">2</value>
+			<value el="T">3</value>
+		</ratio>
+		<ratio property="37">
+			<value el="F">1</value>
+			<value el="E">5</value>
+			<value el="M">5</value>
+			<value el="W">3</value>
+			<value el="T">2</value>
+		</ratio>
+		<ratio property="38">
+			<value el="F">1</value>
+			<value el="E">3</value>
+			<value el="M">4</value>
+			<value el="W">3</value>
+			<value el="T">5</value>
+		</ratio>
+		<ratio property="39">
+			<value el="F">5</value>
+			<value el="E">2</value>
+			<value el="M">1</value>
+			<value el="W">2</value>
+			<value el="T">4</value>
+		</ratio>
+	</basetypes>
 </dictionary>
