@@ -46,7 +46,13 @@ class DictLoaderXML extends DictLoader {
             // each node has single attribute "property", get its value
             $propid = $elem->attributes->item(0)->nodeValue;
             $data = Array();
-
+            foreach ($elem->childNodes as $x) {
+                if ($x->attributes->length == 1) {
+                    $el = $x->attributes->item(0)->nodeValue;
+                    $data[$el] = (int)$x->nodeValue;
+                }
+            }
+            $dict->basetypes[$propid] = $data;
         }
     }
 
@@ -157,7 +163,7 @@ class DictLoaderXML extends DictLoader {
         }
         // <riskgroup id="1" title="Соматические риски">
         // filling $dict->risk
-        // $dict->risk[1] = ["Соматические риски", [hash1: "Гастрит, язвен. б-нь", hash2: "...", ...]];
+        // $dict->risk[1] = ["Соматические риски", [hash1=>"Гастрит, язвен. б-нь", hash2=>"...", ...]];
         for ($i=0; $i < $elements->length; $i++) {
             $elem = $elements->item($i);
             // each node has two attributes (id & title), get its values
