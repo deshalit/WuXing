@@ -15,180 +15,165 @@ const S_NODE_ELEMENT  = 'elem';
 const S_NODE_PROPERTY = 'property';
 const S_NODE_PROFILE  = 'profile';
 const S_NODE_RISK     = 'riskgroup';
+const S_NODE_COMMENT  = 'comment';
+const S_NODE_RATIO    = 'ratio';
+
+const S_ATTR_ID       = 'id';
 const S_ATTR_EL1      = 'el1';
 const S_ATTR_EL2      = 'el2';
-const S_NODE_COMMENT  = 'comment';
 const S_ATTR_PROFILE  = 'profile';
-const S_NODE_RATIO    = 'ratio';
+const S_ATTR_TITLE    = 'title';
+const S_ATTR_NAME     = 'name';
+
 
 class DictLoaderXML extends DictLoader {
     protected $fileName = '';
     protected $xml;
 
-    function __construct($fname) {
+    function __construct($fname)
+    {
        $this->xml = NULL;
        $this->fileName = $fname;
+    }
+
+    private function read_node_basetype(Dictionary $dict, $elem)
+    {
+        $propid = $elem->attributes->item(0)->nodeValue;
+
+        $data = Array();
+        foreach ($elem->childNodes as $x) {
+            if ($x->attributes->length == 1) {
+                // <value el="F">5</value>
+                $el = $x->attributes->item(0)->nodeValue;
+                $data[$el] = (int)$x->nodeValue;
+            }
+        }
+        $dict->basetypes[$propid] = $data;
+    }
+
+    private function read_node_comment(Dictionary $dict, $elem)
+    {
+        // <comment el1="F" el2="E" profile="1"><![CDATA[..]]></comment>
+        // filling $dict->comments
+        // $dict->comments[1] = [hash1=> "...",...];
+        $text = $elem->firstChild->nodeValue;  // <!CDATA[[]]>
+        $att = $elem->attributes;
+        $el1 = $att->getNamedItem(S_ATTR_EL1);
+        $el2 = $att->getNamedItem(S_ATTR_EL2);
+        $profile_id = $att->getNamedItem(S_ATTR_PROFILE)->value;
+        $hash = $dict->get_elem_hash2($el1->value, $el2->value);
+        $dict->comments[$profile_id][$hash] = $text;
+    }
+
+    private function read_node_element(Dictionary $dict, $elem)
+    {
+        // <elem id="F">РћРіРѕРЅСЊ</elem>
+        // filling $dict->elements
+        // $dict->elements["F"] = "РћРіРѕРЅСЊ";
+         $id = $elem->attributes->item(0)->nodeValue;
+         $dict->elements[$id] = $elem->nodeValue;
+    }
+
+    private function read_node_profile(Dictionary $dict, $elem)
+    {
+        // <profile id="1" name="....">
+        // filling $dict->profiles
+        // $dict->profiles[1] = ["Р­РјРѕС†РёРѕРЅР°Р»СЊРЅР°СЏ СЃС„РµСЂР°", [1,3,7,8,11,24,39,31]];
+        $id = $elem->attributes->getNamedItem(S_ATTR_ID)->value;
+        $name = $elem->attributes->getNamedItem(S_ATTR_NAME)->value;
+        $props = Array();
+        foreach ($elem->childNodes as $x) {
+            $value = (int)$x->nodeValue;
+            if ($value) {
+                array_push($props, $value);
+            }
+        }
+        $dict->profiles[$id] = Array($name, $props);
+    }
+
+    private function read_node_property(Dictionary $dict, $elem)
+    {
+        // <property id="28" title="пїЅпїЅпїЅпїЅпїЅпїЅ"><![CDATA[]]></property>
+        // filling $dict->properties
+        // $dict->properties[28] = ["пїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅпїЅ-пїЅпїЅпїЅ..."];
+        $id = $elem->attributes->getNamedItem(S_ATTR_ID)->value;   // id
+        $title = $elem->attributes->getNamedItem(S_ATTR_TITLE)->value;   // title
+        $note = $elem->firstChild->nodeValue;  // <!CDATA[[]]>
+        $dict->properties[$id] = Array($title, $note);
+    }
+
+    private function read_node_risk(Dictionary $dict, $elem)
+    {
+        // <riskgroup id="1" title="пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ">
+        // filling $dict->risk
+        // $dict->risk[1] = ["пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ", [hash1=>"пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ. пїЅ-пїЅпїЅ", hash2=>"...", ...]];
+        $id = $elem->attributes->getNamedItem(S_ATTR_ID)->value;  // id
+        $title = $elem->attributes->getNamedItem(S_ATTR_TITLE)->value;  // title
+            // reading <risk el1="F" el2="E"><![CDATA[пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ. пїЅ-пїЅпїЅ...]]></risk>
+        $risk = Array();
+        foreach ($elem->childNodes as $x) {
+            if ($x->attributes->length == 2) {
+                $el1 = $x->attributes->getNamedItem(S_ATTR_EL1);
+                $el2 = $x->attributes->getNamedItem(S_ATTR_EL2);
+                $hash = $dict->get_elem_hash2($el1->value, $el2->value);
+                $risk[$hash] = $x->firstChild->nodeValue; // CDATA
+            }
+        }
+        if (count($risk) > 0) {
+            $dict->risk[$id] = Array($title, $risk);
+        }
+    }
+
+    private function load_array(Dictionary $dict, $nodeName, callable $func)
+    {
+        $elements = $this->xml->getElementsByTagName($nodeName);
+        if (!isset($elements)) {
+            throw new ErrorException(S_EXCEPTION_FILE_CORRUPTED . " (node <$nodeName> not found");
+        }
+        foreach ($elements as $elem) { 
+            call_user_func($func, $dict, $elem);
+        }
+        return true;
     }
 
     private function load_basetypes(Dictionary $dict)
     {
         $dict->basetypes = Array();
-        // Lets find all the 'ratio' nodes
-        $elements = $this->xml->getElementsByTagName(S_NODE_RATIO);
-        if (!isset($elements)) {
-            throw new ErrorException(S_EXCEPTION_FILE_CORRUPTED . ' (node <' . S_NODE_RATIO . '> not found');
-        }
-        // <ratio property="1">...</ratio>
-        // filling $dict->basetypes
-        // $dict->basetypes[1] = ['F'=> 1, 'M' => 5, ...];
-        for ($i=0; $i < $elements->length; $i++) {
-            $elem = $elements->item($i);
-            // each node has single attribute "property", get its value
-            $propid = $elem->attributes->item(0)->nodeValue;
-            $data = Array();
-            foreach ($elem->childNodes as $x) {
-                if ($x->attributes->length == 1) {
-                    $el = $x->attributes->item(0)->nodeValue;
-                    $data[$el] = (int)$x->nodeValue;
-                }
-            }
-            $dict->basetypes[$propid] = $data;
-        }
+        return $this->load_array($dict, S_NODE_RATIO, Array($this, 'read_node_basetype'));
     }
 
-    private function load_comments(Dictionary $dict) {
+    private function load_comments(Dictionary $dict)
+    {
         $dict->comments = Array();
-        // Lets find all the 'comment' nodes
-        $elements = $this->xml->getElementsByTagName(S_NODE_COMMENT);
-        if (!isset($elements)) {
-            throw new ErrorException(S_EXCEPTION_FILE_CORRUPTED . ' (node <' . S_NODE_COMMENT . '> not found');
-        }
-        // <comment el1="F" el2="E" profile="1"><![CDATA[Повышенная эмоциона...]]></comment>
-        // filling $dict->comments
-        // $dict->comments[1] = [hash1=> "Способность бла-бла-бла...",...];
-        for ($i=0; $i < $elements->length; $i++) {
-            $elem = $elements->item($i);
-            // each node has three attributes (el1, el2, profile), get its values
-            $text = $elem->firstChild->nodeValue;  // <!CDATA[[]]>
-            $att = $elem->attributes;
-            if ($att->length == 3) {
-                $el1 = $att->getNamedItem(S_ATTR_EL1);
-                $el2 = $att->getNamedItem(S_ATTR_EL2);
-                $profile_id = $att->getNamedItem(S_ATTR_PROFILE)->value;
-                $hash = $dict->elem_hash($el1->value, $el2->value);
-                if (empty($dict->comments[$profile_id])) {
-                    $dict->comments[$profile_id] = Array($hash => $text);
-                } else {
-                    $dict->comments[$profile_id][$hash] = $text;
-                }
-            }
-        }
-        var_dump($dict->comments[1]);
-        return count($dict->comments) > 0;
+        return $this->load_array($dict, S_NODE_COMMENT, Array($this, 'read_node_comment'));
     }
 
-    private function load_elements(Dictionary $dict) {
+    private function load_elements(Dictionary $dict)
+    {
         $dict->elements = Array();
-        // Lets find all the "elem' nodes
-        $elements = $this->xml->getElementsByTagName(S_NODE_ELEMENT);
-        if (!isset($elements)) {
-            throw new ErrorException(S_EXCEPTION_FILE_CORRUPTED . ' (node <' . S_NODE_ELEMENT . '> not found');
-        }
-        // <elem id="F">Огонь</elem>
-        // filling $dict->elements
-        // $dict->elements["F"] = "Огонь";
-        for ($i=0; $i < $elements->length; $i++) {
-            $elem = $elements->item($i);
-            // each node has a single attribute, get its value
-            $id = $elem->attributes->item(0)->nodeValue;
-            $dict->elements[$id] = $elem->nodeValue;
-        }
-        return count($dict->elements) > 0;
+        return $this->load_array($dict, S_NODE_ELEMENT, Array($this, 'read_node_element'));
     }
 
-    private function load_properties(Dictionary $dict) {
-        $dict->properties = Array();
-        // Lets find all the "property' nodes
-        $elements = $this->xml->getElementsByTagName(S_NODE_PROPERTY);
-        if (!isset($elements)) {
-            throw new ErrorException(S_EXCEPTION_FILE_CORRUPTED . ' (node <' . S_NODE_PROPERTY . '> not found');
-        }
-        // <property id="28" title="Анализ"><![CDATA[]]></property>
-        // filling $dict->properties
-        // $dict->properties[28] = ["Анализ", "Способность бла-бла-бла..."];
-        for ($i=0; $i < $elements->length; $i++) {
-            $elem = $elements->item($i);
-            // each node has two attributes (id & title), get its values
-            $id = $elem->attributes->item(0)->nodeValue;   // id
-            $title = $elem->attributes->item(1)->nodeValue;   // title
-            $note = $elem->firstChild->nodeValue;  // <!CDATA[[]]>
-            $dict->properties[$id] = Array($title, $note);
-        }
-        return count($dict->properties) > 0;
-    }
-
-    private function load_profiles(Dictionary $dict) {
+    private function load_profiles(Dictionary $dict)
+    {
         $dict->profiles = Array();
-        // Lets find all the "property' nodes
-        $elements = $this->xml->getElementsByTagName(S_NODE_PROFILE);
-        if (!isset($elements)) {
-            throw new ErrorException(S_EXCEPTION_FILE_CORRUPTED . ' (node <' . S_NODE_PROFILE . '> not found');
-        }
-        // <profile id="1" name="Эмоциональная сфера">
-        // filling $dict->profiles
-        // $dict->profiles[1] = ["Эмоциональная сфера", ["Психол. открытость",  "Контактность", ...]];
-        for ($i=0; $i < $elements->length; $i++) {
-            $elem = $elements->item($i);
-            // each node has two attributes (id & name), get its values
-            $id = $elem->attributes->item(0)->nodeValue;
-            $name = $elem->attributes->item(1)->nodeValue;
-            $props = Array();
-            foreach ($elem->childNodes as $x) {
-                $value = (int)$x->nodeValue;
-                if ($value) {
-                    array_push($props, $value);
-                }
-            }
-            $dict->profiles[$id] = Array($name, $props);
-        }
-        return count($dict->profiles) > 0;
+        return $this->load_array($dict, S_NODE_PROFILE, Array($this, 'read_node_profile'));
     }
 
-    private function load_risk(Dictionary $dict) {
+    private function load_properties(Dictionary $dict)
+    {
+        $dict->properties = Array();
+        return $this->load_array($dict, S_NODE_PROPERTY, Array($this, 'read_node_property'));
+    }
+
+    private function load_risk(Dictionary $dict)
+    {
         $dict->risk = Array();
-        // Lets find all the 'riskgroup' nodes
-        $elements = $this->xml->getElementsByTagName(S_NODE_RISK);
-        if (!isset($elements)) {
-            throw new ErrorException(S_EXCEPTION_FILE_CORRUPTED . ' (node <' . S_NODE_RISK . '> not found');
-        }
-        // <riskgroup id="1" title="Соматические риски">
-        // filling $dict->risk
-        // $dict->risk[1] = ["Соматические риски", [hash1=>"Гастрит, язвен. б-нь", hash2=>"...", ...]];
-        for ($i=0; $i < $elements->length; $i++) {
-            $elem = $elements->item($i);
-            // each node has two attributes (id & title), get its values
-            $id = $elem->attributes->item(0)->nodeValue;  // id
-            $title = $elem->attributes->item(1)->nodeValue;  // title
-            // reading <risk el1="F" el2="E"><![CDATA[Гастрит, язвен. б-нь...]]></risk>
-            $risk = Array();
-            foreach ($elem->childNodes as $x) {
-                $text = $x->firstChild->nodeValue; // CDATA
-                if ($x->attributes->length == 2) {
-                    $el1 = $x->attributes->getNamedItem(S_ATTR_EL1);
-                    $el2 = $x->attributes->getNamedItem(S_ATTR_EL2);
-                    $hash = $dict->elem_hash($el1->value, $el2->value);
-                    $risk[$hash] = $text;
-                }
-            }
-            if (count($risk) > 0) {
-                $dict->risk[$id] = Array($title, $risk);
-            }
-        }
-        return count($dict->risk) > 0;
+        return $this->load_array($dict, S_NODE_RISK, Array($this, 'read_node_risk'));
     }
 
-    function Load(Dictionary $dict) {
-
+    function Load(Dictionary $dict)
+    {
         if (!file_exists($this->fileName)) {
             throw new ErrorException(S_EXCEPTION_FILE_NOT_EXISTS);
         }
@@ -197,12 +182,11 @@ class DictLoaderXML extends DictLoader {
             unset($this->xml);
             throw new ErrorException(S_EXCEPTION_FILE_CORRUPTED);
         }
-        //$this->load_elements($dict);
-        //$this->load_properties($dict);
-        //$this->load_profiles($dict);
-        //$this->load_risk($dict);
-        //$this->load_comments($dict);
+        $this->load_elements($dict);
+        $this->load_properties($dict);
+        $this->load_profiles($dict);
+        $this->load_risk($dict);
+        $this->load_comments($dict);
         $this->load_basetypes($dict);
-
     }
 }

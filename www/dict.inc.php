@@ -10,26 +10,28 @@ abstract class DictLoader {
 }
 class Dictionary {
     static $elemHash = Array('F' => 1, 'E' => 2, 'M' => 4, 'W' => 8, 'T' => 16);
-/*
+
     static $combinations = Array(
-        'F' => 'E',  // Îãîíü - Çåìëÿ
-        'F' => 'M',  // Îãîíü - Ìåòàëë
-        'F' => 'W',  // Îãîíü - Âîäà
-        'F' => 'T',  // Îãîíü - Äåðåâî
-        'E' => 'M',  // Îãîíü - Ìåòàëë
-        'E' => 'W',  // Çåìëÿ - Âîäà
-        'E' => 'T',  // Çåìëÿ - Äåðåâî
-        'M' => 'W',  // Ìåòàëë - Âîäà
-        'M' => 'T',  // Ìåòàëë - Äåðåâî
-        'W' => 'T'   // Âîäà - äåðåâî
+        Array('F' => 'E'),  // ÐžÐ³Ð¾Ð½ÑŒ - Ð—ÐµÐ¼Ð»Ñ
+        Array('F' => 'M'),  // ÐžÐ³Ð¾Ð½ÑŒ - ÐœÐµÑ‚Ð°Ð»Ð»
+        Array('F' => 'W'),  // ÐžÐ³Ð¾Ð½ÑŒ - Ð’Ð¾Ð´Ð°
+        Array('F' => 'T'),  // ÐžÐ³Ð¾Ð½ÑŒ - Ð”ÐµÑ€ÐµÐ²Ð¾
+        Array('E' => 'M'),  // ÐžÐ³Ð¾Ð½ÑŒ - ÐœÐµÑ‚Ð°Ð»Ð»
+        Array('E' => 'W'),  // Ð—ÐµÐ¼Ð»Ñ - Ð’Ð¾Ð´Ð°
+        Array('E' => 'T'),  // Ð—ÐµÐ¼Ð»Ñ - Ð”ÐµÑ€ÐµÐ²Ð¾
+        Array('M' => 'W'),  // ÐœÐµÑ‚Ð°Ð»Ð» - Ð’Ð¾Ð´Ð°
+        Array('M' => 'T'),  // ÐœÐµÑ‚Ð°Ð»Ð» - Ð”ÐµÑ€ÐµÐ²Ð¾
+        Array('W' => 'T')   // Ð’Ð¾Ð´Ð° - Ð´ÐµÑ€ÐµÐ²Ð¾
     );
-*/
+
+    static $elemNames = Array ('F' => 'ÐžÐ³Ð¾Ð½ÑŒ', 'E' => 'Ð—ÐµÐ¼Ð»Ñ', 'M' => 'ÐœÐµÑ‚Ð°Ð»Ð»', 'W' => 'Ð’Ð¾Ð´Ð°', 'T' => 'Ð”ÐµÑ€ÐµÐ²Ð¾');
+
     public $profiles = Array();
     public $properties = Array();
     public $elements = Array();
     public $risk = Array();
     public $comments = Array();
-    public $basetypes = Array();
+    public $basetypes = Array();    // $basetypes[ $property_id ] = Array( $element_id => int )
 
     public function Load(DictLoader $loader) {
         if (isset($loader)) {
@@ -38,7 +40,15 @@ class Dictionary {
         } else return false;
     }
 
-    static function elem_hash($el1, $el2) {
-        return self::$elemHash[$el1] | self::$elemHash[$el2];
+    static function get_elem_hash($elems) {
+        $res = 0;
+        foreach ((array)$elems as $x) {
+            $res |= self::$elemHash[$x];
+        }
+        return $res;
     }
+    
+    static function get_elem_hash2($el1, $el2) {
+        return self::get_elem_hash(Array($el1, $el2));
+    }        
 }
