@@ -51,4 +51,16 @@ class Dictionary {
     static function get_elem_hash2($el1, $el2) {
         return self::get_elem_hash(Array($el1, $el2));
     }        
+    
+    public function get_profile_properties($id) {
+        return $this->profiles[$id][1];
+    }    
+    
+    public function get_profile_name($id) {
+        return $this->profiles[$id][0];
+    }
+    
+    public function get_property_name($id) {
+        return $this->properties[$id][0];
+    }    
 }

@@ -15,11 +15,10 @@ class ClientData {
    public $profiles = Array();
     public $complete = false;
 
-   public function reset_profile(Dictionary $dict, $profile_id) {
-      //echo 'Profile_id: '.$profile_id.'<br>';
-      //echo 'Profile_id: '.$profile_id.'<br>';
-      //print_r( array_fill_keys( array_values( $dict->profiles[$profile_id][1]),0 ));
-      $this->profiles[$profile_id] = array_fill_keys( array_values( $dict->profiles[$profile_id][1] ), 0);
-       $this->complete = false;
+   public function reset_profile(Dictionary $dict, $profile_id) 
+   {       // Setting to zero all properties of the profile
+       $this->profiles[$profile_id] = array_fill_keys( $dict->get_profile_properties($profile_id), 0);
+           // Resetting the completion flag
+       $this->complete = false;  
    }
 }

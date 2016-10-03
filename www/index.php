@@ -19,9 +19,9 @@ function analyze_params(Dictionary $dict, ClientData $data, $input)
     $data->elems = Array();
     $el1 = $input['el1'];
     $el2 = $input['el2'];
-    $ratio = doubleval($input['ratio']);
-    $data->elems[$el1] = $ratio;
-    $data->elems[$el2] = 1.0 - $ratio;
+    $data->elems[$el1] = doubleval($input['value1']);
+    $data->elems[$el2] = doubleval($input['value2']);
+    print_r($data->elems);
     foreach (array_keys($dict->profiles) as $id) {
         if (!empty($input['prof' . $id])) {  // prof1=on&prof5=on...
                 $data->reset_profile($dict, $id);
