@@ -6,16 +6,52 @@
     <style>
         #form {float: left; margin-left: 50px; padding: 20px 20px;}
         #result {float: left; margin-right: 50px; padding: 20px 20px;}
+        #result div {float: left;}
     </style>
+    <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="excanvas.js"></script><![endif]-->
+    <script language="javascript" type="text/javascript" src="jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="jquery.jqplot.min.js"></script>
+    <script language="javascript" type="text/javascript" src="jqplot.barRenderer.min.js"></script>
+    <script language="javascript" type="text/javascript" src="jqplot.categoryAxisRenderer.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="jquery.jqplot.css" />
     <script>
-        function range1changed() {
-            el = document.getElementById("elem1val");
-            el.valueAsNumber = document.getElementById("balance").value;
-        }    
+        $(document).ready(function(){
+            $.jqplot.config.enablePlugins = true;
+
+        });
+    </script>
+    <script>
+        function ViewData(data, names, holderName) {
+            $('#'+holderName).bind('jqplotDataClick',
+                function (ev, seriesIndex, pointIndex, data) {
+                    $('#info1').html('series: '+seriesIndex+', point: '+pointIndex+', data: '+data);
+                }
+            );
+            plot1 = $.jqplot(holderName, [data], {
+                // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
+                animate: !$.jqplot.use_excanvas,
+                seriesDefaults:{
+                    renderer:$.jqplot.BarRenderer,
+                    //pointLabels: { show: true },
+                    pointLabels: { show: true, location: 'e', edgeTolerance: -15 },
+                    rendererOptions: {
+                        barDirection: 'horizontal'}
+                },
+                axes: {
+                    yaxis: {
+                        renderer: $.jqplot.CategoryAxisRenderer,
+                        ticks: names
+                    }
+                },
+                highlighter: { show: false }
+            });
+        }
+    </script>
+    <script>
         function value1changed(newvalue) {
             el = document.getElementById("elem2val");
             if (el && (el.valueAsNumber != (1.0 - newvalue))) {
-            el.valueAsNumber = 1.0 - newvalue;
+                el.valueAsNumber = 1.0 - newvalue;
             }            
         }    
         function value2changed(newvalue) {
@@ -27,20 +63,6 @@
     </script>
 </head>
 <body>
-<?php if ($mainData->complete) {
-    echo '<div id="result">' . "\n" . '<table>' . "\n";
-    echo "<tr><td>Срез</td><td>Результат</td></tr>\n";
-    foreach ($mainData->profiles as $pid=>$pdata) {
-        echo "<tr><td>" . $dictionary->get_profile_name($pid) . "</td><td></td></tr>\n";
-        $props = $dictionary->get_profile_properties($pid);
-        foreach ($props as $propid) {
-            echo "<tr><td>" . $dictionary->get_property_name($propid) . "</td>"; // title of property
-            echo "<td>$pdata[$propid]</td></tr>\n";
-        }
-    }
-    echo "</table>\n</div>\n";
-} ?>
-
     <div id="form">
         <form action="index.php" method="post">
             <fieldset>
@@ -53,7 +75,8 @@
             </fieldset>
             <fieldset>
                 <label for="elemcount">Сколько элементов:</label>
-                <input id="elemcount" type="number" min="2" max="5" value="2" readonly onchange="elem_count_changed(this.value)"/><br/>
+                <input id="elemcount" type="number" min="2" max="5" value="2" readonly onchange="elem_count_changed(this.value)"/>
+                <br /><br/>
                 <label for="elem1">Элемент 1:</label>
                 <select id="elem1" name="el1">
                     <?php foreach(Dictionary::$elemNames as $key=>$name) {
@@ -65,7 +88,7 @@
                 <datalist id="steps">
                     <option value="0.5" label="0.5">
                 </datalist>
-                -->
+                --><br/>
                 <label for="elem2">Элемент 2:</label>
                 <select id="elem2" name="el2">
                     <?php foreach(Dictionary::$elemNames as $key=>$name) {
@@ -86,5 +109,20 @@
             <input type="submit" value="Рассчитать" />
     </form>
     </div>
+    <?php if ($mainData->complete) {
+        echo '<div id="result">' . "\n";
+        //echo "<tr><td>Срез</td><td>Результат</td></tr>\n";
+        foreach ($mainData->profiles as $pid=>$pdata) {
+            echo 'div id="profile_' . $pid . '"><table>';
+            echo "<tr><td>" . $dictionary->get_profile_name($pid) . "</td><td></td></tr>\n";
+            $props = $dictionary->get_profile_properties($pid);
+            foreach ($props as $propid) {
+                echo "<tr><td>" . $dictionary->get_property_name($propid) . "</td>"; // title of property
+                echo "<td>$pdata[$propid]</td></tr>\n";
+            }
+            echo '</table><div id="chart_' . $pid . '"></div>';
+        }
+        echo "</div>\n"; // end of div #result
+    } ?>
 </body>
 </html>
