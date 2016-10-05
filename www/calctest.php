@@ -6,7 +6,7 @@
     <style>
         #form {float: left; margin-left: 50px; padding: 20px 20px;}
         #result {float: left; margin-right: 50px; padding: 20px 20px;}
-        .chartholder { float: left; width: 400px; minheight: 200px; height: 300px; margin: 30px; }
+        .chartholder { float: left; width: 500px; minwidth: 200px; minheight: 200px; height: 300px; margin: 30px; }
         table {float: left; margin: 20px 10px 20px 20px;}
         
     </style>
