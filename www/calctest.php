@@ -6,33 +6,38 @@
     <style>
         #form {float: left; margin-left: 50px; padding: 20px 20px;}
         #result {float: left; margin-right: 50px; padding: 20px 20px;}
-        #result div {float: left;}
+        .chartholder { float: left; width: 400px; minheight: 200px; height: 300px; margin: 30px; }
+        table {float: left; margin: 20px 10px 20px 20px;}
+        
     </style>
     <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="excanvas.js"></script><![endif]-->
     <script language="javascript" type="text/javascript" src="jquery.min.js"></script>
     <script language="javascript" type="text/javascript" src="jquery.jqplot.min.js"></script>
     <script language="javascript" type="text/javascript" src="jqplot.barRenderer.min.js"></script>
     <script language="javascript" type="text/javascript" src="jqplot.categoryAxisRenderer.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="jquery.jqplot.css" />
+    <link rel="stylesheet" type="text/css" href="jquery.jqplot.min.css" />
     <script>
-        $(document).ready(function(){
-            $.jqplot.config.enablePlugins = true;
-
-        });
+        $(document).ready( function(){
+                $.jqplot.config.enablePlugins = true;
+                if (document.getElementById('result')) {
+                    for (var i=0; i<Profiles.length; i++) {
+                        holderID = 'chart_' + Profiles[i].id;
+                        $("#" + holderID).bind("jqplotDataClick", 
+                            function (ev, seriesIndex, pointIndex, data) {
+                                      $("#info1").html("series: " + seriesIndex + ", point: " + pointIndex + ", data: " + data); 
+                            } );                                          
+                        ViewData(Profiles[i].data, Profiles[i].names, holderID);
+                    }
+                }    
+           } );
     </script>
     <script>
-        function ViewData(data, names, holderName) {
-            $('#'+holderName).bind('jqplotDataClick',
-                function (ev, seriesIndex, pointIndex, data) {
-                    $('#info1').html('series: '+seriesIndex+', point: '+pointIndex+', data: '+data);
-                }
-            );
-            plot1 = $.jqplot(holderName, [data], {
+        function ViewData(data, names, holderID) {
+            plot1 = $.jqplot(holderID, [data], {
                 // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
                 animate: !$.jqplot.use_excanvas,
                 seriesDefaults:{
-                    renderer:$.jqplot.BarRenderer,
-                    //pointLabels: { show: true },
+                    renderer: $.jqplot.BarRenderer,
                     pointLabels: { show: true, location: 'e', edgeTolerance: -15 },
                     rendererOptions: {
                         barDirection: 'horizontal'}
@@ -101,7 +106,7 @@
                 <label>Срезы:</label><br/>
                 <?php
                     foreach($dictionary->profiles as $id=>$data) {
-                        echo '<input type="checkbox" name="prof' . $id . '">' . $data[0] . "<br/>\n";
+                        echo '<input type="checkbox" id="prof' . $id . '" name="prof' . $id . '">' . $data[0] . "<br/>\n";
                     }
                 ?>
             </fieldset>
@@ -110,19 +115,39 @@
     </form>
     </div>
     <?php if ($mainData->complete) {
-        echo '<div id="result">' . "\n";
-        //echo "<tr><td>Срез</td><td>Результат</td></tr>\n";
+        echo '<script>' . 
+             'document.getElementById("firstname").value = "' . $mainData->first_name . '"; ' .
+             'document.getElementById("lastname").value = "' . $mainData->last_name . '"; ' .
+             'document.getElementById("email").value = "' . $mainData->email . '"; ';
+        $temp = array_keys($mainData->elems);
+        for($i=0; $i<count($temp); $i++) {
+            echo 'document.getElementById("elem' . ($i+1) . '").value = "' . $temp[$i] . '"; ' .
+                 'document.getElementById("elem' . ($i+1) . 'val").value = ' . $mainData->elems[$temp[$i]] . '; ';
+            }    
         foreach ($mainData->profiles as $pid=>$pdata) {
-            echo 'div id="profile_' . $pid . '"><table>';
+            echo 'document.getElementById("prof' . $pid . '").checked = true;';
+        }    
+        echo '</script>';
+        $createProfileStrings = Array();
+        echo '<div id="result">' . "\n";
+        foreach ($mainData->profiles as $pid=>$pdata) {
+            echo '<div id="profile_' . $pid . '"><table>';
             echo "<tr><td>" . $dictionary->get_profile_name($pid) . "</td><td></td></tr>\n";
-            $props = $dictionary->get_profile_properties($pid);
+            $props = $dictionary->get_profile_properties($pid);            
+            $names = Array();
             foreach ($props as $propid) {
-                echo "<tr><td>" . $dictionary->get_property_name($propid) . "</td>"; // title of property
+                $prop_name = $dictionary->get_property_name($propid);                
+                $names[] = $prop_name;
+                echo "<tr><td>" . $prop_name . "</td>"; // title of property
                 echo "<td>$pdata[$propid]</td></tr>\n";
             }
-            echo '</table><div id="chart_' . $pid . '"></div>';
+            $createProfileStrings[] = ' { id: ' . $pid . ', data: [' . implode(',', array_reverse( array_values($pdata))) 
+                                    . '], names: ["' . implode('","', array_reverse($names)) . '"]}';
+            $holderID = 'chart_' . $pid;
+            echo '</table><div class="chartholder" id="' . $holderID . '"></div>';
         }
         echo "</div>\n"; // end of div #result
+        echo '<script> var Profiles = [' . implode(',', $createProfileStrings) . ']; </script>';
     } ?>
 </body>
 </html>

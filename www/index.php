@@ -21,7 +21,7 @@ function analyze_params(Dictionary $dict, ClientData $data, $input)
     $el2 = $input['el2'];
     $data->elems[$el1] = doubleval($input['value1']);
     $data->elems[$el2] = doubleval($input['value2']);
-    print_r($data->elems);
+    //print_r($data->elems);
     foreach (array_keys($dict->profiles) as $id) {
         if (!empty($input['prof' . $id])) {  // prof1=on&prof5=on...
                 $data->reset_profile($dict, $id);
@@ -49,6 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     calculate($dictionary, $mainData);
     //var_dump($mainData->profiles);
 }
+
 //} else {
     include "calctest.php";
 
