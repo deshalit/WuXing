@@ -35,7 +35,7 @@
         function ViewData(data, names, holderID) {
             plot1 = $.jqplot(holderID, [data], {
                 // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
-                animate: !$.jqplot.use_excanvas,
+                animate: false, //!$.jqplot.use_excanvas,
                 seriesDefaults:{
                     renderer: $.jqplot.BarRenderer,
                     pointLabels: { show: true, location: 'e', edgeTolerance: -15 },
@@ -46,7 +46,8 @@
                     yaxis: {
                         renderer: $.jqplot.CategoryAxisRenderer,
                         ticks: names
-                    }
+                    },
+                   xaxis: { max: 5.0 }
                 },
                 highlighter: { show: false }
             });
@@ -79,28 +80,20 @@
                 <input id="email" type="email" name="email" placeholder="test@test.net"/><br />
             </fieldset>
             <fieldset>
-                <label for="elemcount">Сколько элементов:</label>
-                <input id="elemcount" type="number" min="2" max="5" value="2" readonly onchange="elem_count_changed(this.value)"/>
-                <br /><br/>
-                <label for="elem1">Элемент 1:</label>
-                <select id="elem1" name="el1">
-                    <?php foreach(Dictionary::$elemNames as $key=>$name) {
-                           echo '<option value="' . $key . '">' . $name . "</option>\n";
-                          } ?>
-                </select>
-                <input id="elem1val" name="value1" type="number" min="0.01" max="0.99" step="0.01" value="0.5" list="steps" onchange="value1changed(this.value)"/><br/>
-                <!-- <input id="balance" name="ratio" type="range" min="0.01" max="0.99" value="0.50" step="0.01" list="steps" onchange=""/><br/>
+                <table>
+                <?php
+                        foreach(Dictionary::$elemNames as $key=>$name) {
+                            echo '<tr><td><label for="elem_' . $key . '_chk">' . mb_substr($name, 0, 1, 'UTF-8') . '</label></td>' .
+                                 '<td><input id="' . $key . '_chk" type="checkbox" /></td>' .
+                                 '<td><input id="value_"' . $key . '" name="el_' . $key . '" type="number" min="0.0" value="0.5" /></td></tr><br/>';
+                } ?>
+                </table>
+                <!-- <input id="elem1val" name="value1" type="number" min="0.01" max="0.99" step="0.01" value="0.5" list="steps" onchange="value1changed(this.value)"/><br/>
+                <input id="balance" name="ratio" type="range" min="0.01" max="0.99" value="0.50" step="0.01" list="steps" onchange=""/><br/>
                 <datalist id="steps">
                     <option value="0.5" label="0.5">
                 </datalist>
-                --><br/>
-                <label for="elem2">Элемент 2:</label>
-                <select id="elem2" name="el2">
-                    <?php foreach(Dictionary::$elemNames as $key=>$name) {
-                        echo '<option value="' . $key . '">' . $name . "</option>\n";
-                    } ?>
-                </select>
-                <input id="elem2val" name="value2" type="number" min="0.01" max="0.99" step="0.01" value="0.5" onchange="value2changed(this.valueAsNumber)"/>
+                -->
             </fieldset>
             <fieldset>
                 <label>Срезы:</label><br/>
