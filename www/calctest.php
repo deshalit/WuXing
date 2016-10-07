@@ -7,7 +7,8 @@
         #form {float: left; margin-left: 50px; padding: 20px 20px;}
         #result {float: left; margin-right: 50px; padding: 20px 20px;}
         .chartholder { float: left; width: 500px; minwidth: 200px; minheight: 200px; height: 300px; margin: 30px; }
-        table {float: left; margin: 20px 10px 20px 20px;}
+        #result table {float: left; margin: 20px 10px 20px 20px;}
+	#elems { margin: 5px 5px; }
         
     </style>
     <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="excanvas.js"></script><![endif]-->
@@ -47,7 +48,7 @@
                         renderer: $.jqplot.CategoryAxisRenderer,
                         ticks: names
                     },
-                   xaxis: { max: 5.0 }
+                    xaxis: { max: 5.0 }
                 },
                 highlighter: { show: false }
             });
@@ -66,6 +67,9 @@
                 el.valueAsNumber = 1.0 - newvalue;
             }           
         }                    
+        function elem_state_changed(elemid, checked) {
+            $("#" + elemid.replace('elem', 'value').replace('_chk', '')).prop("disabled", !checked);
+        }                    
     </script>
 </head>
 <body>
@@ -79,14 +83,12 @@
                 <label for="email">Email:</label><br />
                 <input id="email" type="email" name="email" placeholder="test@test.net"/><br />
             </fieldset>
-            <fieldset>
-                <table>
-                <?php
-                        foreach(Dictionary::$elemNames as $key=>$name) {
-                            echo '<tr><td><label for="elem_' . $key . '_chk">' . mb_substr($name, 0, 1, 'UTF-8') . '</label></td>' .
-                                 '<td><input id="' . $key . '_chk" type="checkbox" /></td>' .
-                                 '<td><input id="value_"' . $key . '" name="el_' . $key . '" type="number" min="0.0" value="0.5" /></td></tr><br/>';
-                } ?>
+            <fieldset><table id="elems">
+     <?php  foreach(Dictionary::$elemNames as $key=>$name) {
+               echo '<tr><td><label for="elem_' . $key . '_chk">' . mb_substr($name, 0, 1, 'UTF-8') . '</label></td>' .
+                    '<td><input id="elem_' . $key . '_chk" type="checkbox" onchange="elem_state_changed(this.id, this.checked)" /></td>' .
+                    '<td><input id="value_' . $key . '" name="el_' . $key . '" type="number" min="0.0" value="0.5" step="0.05" disabled /></td></tr>';
+     } ?>
                 </table>
                 <!-- <input id="elem1val" name="value1" type="number" min="0.01" max="0.99" step="0.01" value="0.5" list="steps" onchange="value1changed(this.value)"/><br/>
                 <input id="balance" name="ratio" type="range" min="0.01" max="0.99" value="0.50" step="0.01" list="steps" onchange=""/><br/>
@@ -108,15 +110,15 @@
     </form>
     </div>
     <?php if ($mainData->complete) {
-        echo '<script>' . 
-             'document.getElementById("firstname").value = "' . $mainData->first_name . '"; ' .
-             'document.getElementById("lastname").value = "' . $mainData->last_name . '"; ' .
-             'document.getElementById("email").value = "' . $mainData->email . '"; ';
-        $temp = array_keys($mainData->elems);
-        for($i=0; $i<count($temp); $i++) {
-            echo 'document.getElementById("elem' . ($i+1) . '").value = "' . $temp[$i] . '"; ' .
-                 'document.getElementById("elem' . ($i+1) . 'val").value = ' . $mainData->elems[$temp[$i]] . '; ';
+        echo '<script>'
+           . 'document.getElementById("firstname").value = "' . $mainData->first_name . '"; ' 
+           . 'document.getElementById("lastname").value = "' . $mainData->last_name . '"; ' 
+           . 'document.getElementById("email").value = "' . $mainData->email . '"; '; 
+        foreach($mainData->elems as $elkey=>$elvalue) {
+            echo 'document.getElementById("elem_' . $elkey . '_chk").checked = "on"; ' .
+                 'el = document.getElementById("value_' . $elkey . '"); if (el) { el.disabled = false; el.value = ' . $elvalue . '}; ';
             }    
+  
         foreach ($mainData->profiles as $pid=>$pdata) {
             echo 'document.getElementById("prof' . $pid . '").checked = true;';
         }    

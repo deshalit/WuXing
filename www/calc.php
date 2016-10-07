@@ -17,7 +17,7 @@ function validate_elements($elems) {
         $sum -= abs($value);
         //echo 'Sum = ' . $sum . '<br>';
     }
-    //echo 'round(abs($sum), 2): ' . round(abs($sum), 2);
+//    print_r ($elems);
     return round(abs($sum), CALC_PRECISION) == 0.0;
 }
 

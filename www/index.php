@@ -17,11 +17,12 @@ function analyze_params(Dictionary $dict, ClientData $data, $input)
     $data->last_name = $input['lname'];
     $data->email = $input['email'];
     $data->elems = Array();
-    $el1 = $input['el1'];
-    $el2 = $input['el2'];
-    $data->elems[$el1] = doubleval($input['value1']);
-    $data->elems[$el2] = doubleval($input['value2']);
-    //print_r($data->elems);
+    foreach(Dictionary::$elemNames as $key=>$name) {
+        $elval = $input['el_' . $key];
+        if ($elval) {
+             $data->elems[$key] = doubleval($input['el_' . $key]);   
+        }     
+    }
     foreach (array_keys($dict->profiles) as $id) {
         if (!empty($input['prof' . $id])) {  // prof1=on&prof5=on...
                 $data->reset_profile($dict, $id);
