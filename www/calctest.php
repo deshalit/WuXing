@@ -1,3 +1,6 @@
+<?php
+const MIN_CHART_HEIGHT = 175;
+?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -6,8 +9,10 @@
     <style>
         #form {float: left; margin-left: 50px; padding: 20px 20px;}
         #result {float: left; margin-right: 50px; padding: 20px 20px;}
-        .chartholder { float: left; width: 500px; minwidth: 200px; minheight: 200px; height: 300px; margin: 30px; }
-        #result table {float: left; margin: 20px 10px 20px 20px;}
+        .chartholder { /*background-color: darkgrey;*/ float: left; width: 500px; minwidth: 200px;
+                       minheight: <?=MIN_CHART_HEIGHT?>px; margin: 30px; }
+        #result table {float: left; margin: 20px 10px 20px 20px; width: 250px; }
+        #wrong_sum {color: darkred; font-weight: bold;}
 	#elems { margin: 5px 5px; }
         
     </style>
@@ -23,6 +28,7 @@
                 if (document.getElementById('result')) {
                     for (var i=0; i<Profiles.length; i++) {
                         holderID = 'chart_' + Profiles[i].id;
+                        //$("#" + holderID).height = Profiles[i].data.length * 35;
                         $("#" + holderID).bind("jqplotDataClick", 
                             function (ev, seriesIndex, pointIndex, data) {
                                       $("#info1").html("series: " + seriesIndex + ", point: " + pointIndex + ", data: " + data); 
@@ -66,16 +72,34 @@
             if (el && (el.valueAsNumber != (1.0 - newvalue))) {
                 el.valueAsNumber = 1.0 - newvalue;
             }           
-        }                    
+        }
+        function calc_sum() {
+            var sum = parseFloat(0.0);
+            $('#elems input[type="number"]:enabled').each(function(index, element){
+                sum += parseFloat(element.value) });
+            return sum; // { console.log('Wrong sum: ' + sum); }
+        }
+        function sum_changed() {
+            var sum = calc_sum();
+            if (sum != 1.0){ $('#wrong_sum').text(sum); $('#wrong_sum').show();
+            } else {
+                $('#wrong_sum').hide(); //console.log('Good sum');
+            }
+        }
         function elem_state_changed(elemid, checked) {
             $("#" + elemid.replace('elem', 'value').replace('_chk', '')).prop("disabled", !checked);
-        }                    
+            sum_changed();
+        }
+        function elem_value_changed() {
+            sum_changed();
+        }
     </script>
 </head>
 <body>
     <div id="form">
         <form action="index.php" method="post">
             <fieldset>
+                <legend>Персона</legend>
                 <label for="firstname">Имя:</label><br />
                 <input id="firstname" type="text" name="fname" placeholder="Иван" /><br />
                 <label for="lastname">Фамилия:</label><br />
@@ -83,22 +107,17 @@
                 <label for="email">Email:</label><br />
                 <input id="email" type="email" name="email" placeholder="test@test.net"/><br />
             </fieldset>
-            <fieldset><table id="elems">
-     <?php  foreach(Dictionary::$elemNames as $key=>$name) {
-               echo '<tr><td><label for="elem_' . $key . '_chk">' . mb_substr($name, 0, 1, 'UTF-8') . '</label></td>' .
-                    '<td><input id="elem_' . $key . '_chk" type="checkbox" onchange="elem_state_changed(this.id, this.checked)" /></td>' .
-                    '<td><input id="value_' . $key . '" name="el_' . $key . '" type="number" min="0.0" value="0.5" step="0.05" disabled /></td></tr>';
-     } ?>
+            <fieldset><legend>Элементы</legend><table id="elems">
+                <label id="wrong_sum" hidden></label><br/>
+                <?php  foreach(Dictionary::$elemNames as $key=>$name) {
+                    echo '<tr><td><label for="elem_' . $key . '_chk">' . mb_substr($name, 0, 1, 'UTF-8') . '</label></td>' .
+                        '<td><input id="elem_' . $key . '_chk" type="checkbox" onchange="elem_state_changed(this.id, this.checked)" /></td>' .
+                        '<td><input class="elvalue" id="value_' . $key . '" name="el_' . $key . '" type="number" min="0.0" max="0.95" value="0.5" step="0.05" disabled onchange="elem_value_changed()"/></td></tr>';
+                } ?>
+
                 </table>
-                <!-- <input id="elem1val" name="value1" type="number" min="0.01" max="0.99" step="0.01" value="0.5" list="steps" onchange="value1changed(this.value)"/><br/>
-                <input id="balance" name="ratio" type="range" min="0.01" max="0.99" value="0.50" step="0.01" list="steps" onchange=""/><br/>
-                <datalist id="steps">
-                    <option value="0.5" label="0.5">
-                </datalist>
-                -->
             </fieldset>
-            <fieldset>
-                <label>Срезы:</label><br/>
+            <fieldset><legend>Срезы</legend>
                 <?php
                     foreach($dictionary->profiles as $id=>$data) {
                         echo '<input type="checkbox" id="prof' . $id . '" name="prof' . $id . '">' . $data[0] . "<br/>\n";
@@ -139,7 +158,9 @@
             $createProfileStrings[] = ' { id: ' . $pid . ', data: [' . implode(',', array_reverse( array_values($pdata))) 
                                     . '], names: ["' . implode('","', array_reverse($names)) . '"]}';
             $holderID = 'chart_' . $pid;
-            echo '</table><div class="chartholder" id="' . $holderID . '"></div>';
+            $h = count($props)*30;
+            $h = ($h < MIN_CHART_HEIGHT) ? MIN_CHART_HEIGHT : $h;
+            echo '</table><div class="chartholder" id="' . $holderID . '" style="height: ' . $h . 'px;"></div>';
         }
         echo "</div>\n"; // end of div #result
         echo '<script> var Profiles = [' . implode(',', $createProfileStrings) . ']; </script>';
