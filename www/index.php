@@ -9,58 +9,51 @@ $dictionary = new Dictionary();
 $loader = new DictLoaderXML('dict.xml');
 $dictionary->Load($loader);
 
-$mainData = new ClientData();
+$mainData = new RequestData();
 
-function analyze_params(Dictionary $dict, ClientData $data, $input)
+function fill_client_data($no, ClientData $data, $input) 
 {
-    $data->first_name = $input['fname'];
-    $data->last_name = $input['lname'];
-    $data->email = $input['email'];
+    $data->first_name = $input['fname' . $no];
+    $data->last_name  = $input['lname' . $no];
+    $data->email      = $input['email' . $no];
     $data->elems = Array();
+    $data->profiles = Array();
     foreach(Dictionary::$elemNames as $key=>$name) {
-        $elval = $input['el_' . $key];
+        $elval = $input['el' . $no . '_' . $key];
         if ($elval) {
-             $data->elems[$key] = doubleval($input['el_' . $key]);   
+             $data->elems[$key] = doubleval($input['el' . $no . '_' . $key]);   
         }     
-    }
-    foreach (array_keys($dict->profiles) as $id) {
-        if (!empty($input['prof' . $id])) {  // prof1=on&prof5=on...
-                $data->reset_profile($dict, $id);
-                //print_r($data->profiles[$id]);
-        }
     }
 }
 
-function calculate(Dictionary $dict, ClientData $data) {
-    // profiles[profile_id] = [ property_id1 => value, property_id2 => value, property_id3 => value,... ]
-    foreach ($data->profiles as $profile_id=>$props) {
-        //echo 'Profile:' . $dict->profiles[$profile_id][0] . '<br/>';
-        foreach (array_keys($props) as $prop_id) {
-            //echo '     Property: ' . $dict->properties[$prop_id][0] . '<br/>';
-            $data->profiles[$profile_id][$prop_id] = calculate_prop($dict, $data->elems, $prop_id);
+function calc_client(Dictionary $dict, ClientData $client, $profile_id, $prop_id) {
+    $client->profiles[$profile_id][$prop_id] = calculate_prop($dict, $client->elems, $prop_id);
+}
+
+function analyze_params(Dictionary $dict, RequestData $data, $input) 
+{
+    $data->mode = empty($input['mode']) ? MODE_DEFAULT : $input['mode']; 
+    fill_client_data(1, $data->client1, $input);
+    if ($data->mode == MODE_TWO) { fill_client_data(2, $data->client2, $input); }    
+    $data->profiles = Array();    
+    foreach ($dict->profiles as $profile_id=>$props) {
+        if (isset($input['prof' . $profile_id])) {  // prof1=on&prof5=on...
+            $data->profiles[] = $profile_id;
+            foreach ($dict->get_profile_properties($profile_id) as $prop_id) {
+                calc_client($dict, $data->client1, $profile_id, $prop_id);               
+                if ($data->mode == MODE_TWO) {
+                   calc_client($dict, $data->client2, $profile_id, $prop_id); 
+                }
+            }    
         }
-    }
+    }    
     $data->complete = true;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     analyze_params($dictionary, $mainData, $_POST);
-    //print_r($mainData->profiles);
-    //echo '-----------------------------------';
-    calculate($dictionary, $mainData);
-    //var_dump($mainData->profiles);
 }
 
-//} else {
+
     include "calctest.php";
 
-/*
-class Order {
-    private $_time;
-    private $_firstname = '';
-    private $_lastname = '';
-    private $_email = '';
-    private $_complete = false;
-    
-}
-*/
