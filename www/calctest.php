@@ -1,5 +1,16 @@
 <?php
 const MIN_CHART_HEIGHT = 175;
+const H_KOEF_1 = 30;
+const H_KOEF_2 = 50;
+
+    function calc_row_height(RequestData $data, $pcount) {
+        if ($data->mode == MODE_TWO) {
+            $h = $pcount*H_KOEF_2;
+        } else {
+            $h = $pcount*H_KOEF_1;
+        }
+        return ($h < MIN_CHART_HEIGHT) ? MIN_CHART_HEIGHT : $h;
+    }
 
     function fill_client_form_data(ClientData $client, $no) {
         echo    
@@ -12,12 +23,12 @@ const MIN_CHART_HEIGHT = 175;
             }    
     }
 
-    function get_data_cells(RequestData $mainData, $profile_id, $property_id) {
+    function out_data_cells(RequestData $mainData, $profile_id, $property_id) {
         echo '<td>';
         if ($property_id) {
             echo $mainData->client1->profiles[$profile_id][$property_id];  
             if ($mainData->mode == MODE_TWO) {
-                echo '</td><td>' . $mainData->client1->profiles[$profile_id][$property_id];
+                echo '</td><td>' . $mainData->client2->profiles[$profile_id][$property_id];
             } 
         } else {
             if ($mainData->mode == MODE_TWO) { 
@@ -28,11 +39,16 @@ const MIN_CHART_HEIGHT = 175;
     }
     
     function get_data_string(RequestData $mainData, $profile_id) {
-        return implode(',', array_reverse( array_values($mainData->client1->profiles[$profile_id]))); 
+        $res = '[' . implode(',', array_reverse( array_values($mainData->client1->profiles[$profile_id]))) . ']';
+        if ($mainData->mode == MODE_TWO) {
+            return $res . ', [' . implode(',', array_reverse( array_values($mainData->client2->profiles[$profile_id]))) .']';
+        } else {
+            return $res;
+        }
     }
 
     function fill_form_data(RequestData $mainData) { 
-        echo '<script> $("#mode").value = "' . $mainData->mode . '"; ';    
+        echo '<script> $("#mode").prop("value", "' . $mainData->mode . '"); ';
         fill_client_form_data($mainData->client1, 1);
         if ($mainData->mode == MODE_TWO) { fill_client_form_data($mainData->client2, 2); }
         foreach (array_values($mainData->profiles) as $pid) {
@@ -58,17 +74,19 @@ const MIN_CHART_HEIGHT = 175;
         #result table {float: left; margin: 20px 10px 20px 20px; width: 250px; }
         #wrong_sum1, #wrong_sum2 {color: darkred; font-weight: bold;}
         #elems { margin: 5px 5px; }
-        
+        #mode { margin-right: 20px;}
+        #btn_submit {float: right; cursor: hand;}
     </style>
     <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="excanvas.js"></script><![endif]-->
-    <script language="javascript" type="text/javascript" src="jquery.min.js"></script>
-    <script language="javascript" type="text/javascript" src="jquery.jqplot.min.js"></script>
-    <script language="javascript" type="text/javascript" src="jqplot.barRenderer.min.js"></script>
-    <script language="javascript" type="text/javascript" src="jqplot.categoryAxisRenderer.min.js"></script>
+    <script src="jquery.min.js"></script>
+    <script src="jquery.jqplot.min.js"></script>
+    <script src="jqplot.barRenderer.min.js"></script>
+    <script src="jqplot.categoryAxisRenderer.min.js"></script>
+    <script src="jqplot.pointLabels.min.js"></script>
     <link rel="stylesheet" type="text/css" href="jquery.jqplot.min.css" />
     <script>
         $(document).ready( function(){
-                onmodechanged( $('#mode').value );         
+                onmodechanged( $('#mode').prop("value") );
         
                 $.jqplot.config.enablePlugins = true;
                 if (document.getElementById('result')) {
@@ -86,12 +104,14 @@ const MIN_CHART_HEIGHT = 175;
     </script>
     <script>
         function ViewData(data, names, holderID) {
-            $.jqplot(holderID, [data], {
+            console.log(data);
+            $.jqplot(holderID, data, {
                 // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
                 animate: false, //!$.jqplot.use_excanvas,
                 seriesDefaults:{
                     renderer: $.jqplot.BarRenderer,
                     pointLabels: { show: true, location: 'e', edgeTolerance: -15 },
+                    shadowAngle: 135,
                     rendererOptions: {
                         barDirection: 'horizontal'}
                 },
@@ -208,7 +228,8 @@ const MIN_CHART_HEIGHT = 175;
             <section id="profiles">    
                 <fieldset><legend>Срезы</legend>
                     <button type="button" onclick="select_all_profs()">выбрать все</button>
-                    <button type="button" onclick="unselect_all_profs()">снять все</button><br/>
+                    <button type="button" onclick="unselect_all_profs()">снять все</button>
+                    <button type="submit" id="btn_submit">Рассчитать</button><br/>
                     <?php
                         foreach($dictionary->profiles as $id=>$data) {
                             echo '<input type="checkbox" id="prof' . $id . '" name="prof' . $id . '">' . $data[0] . "<br/>\n";
@@ -225,7 +246,7 @@ const MIN_CHART_HEIGHT = 175;
         foreach (array_values($mainData->profiles) as $pid) {
             echo '<div id="profile_' . $pid . '"><table>';
             echo "<tr><td>" . $dictionary->get_profile_name($pid) . '</td>';
-            get_data_cells($mainData, $pid, 0);
+            out_data_cells($mainData, $pid, 0);
             echo "</tr>\n";
             $props = $dictionary->get_profile_properties($pid);            
             $names = Array();
@@ -233,15 +254,14 @@ const MIN_CHART_HEIGHT = 175;
                 $prop_name = $dictionary->get_property_name($propid);                
                 $names[] = $prop_name;
                 echo "<tr><td>" . $prop_name . "</td>"; // title of property
-                get_data_cells($mainData, $pid, $propid);
+                out_data_cells($mainData, $pid, $propid);
                 echo "</tr>\n";
             }
             $createProfileStrings[] = ' { id: ' . $pid . ', data: [' . get_data_string($mainData, $pid)
                                     . '], names: ["' . implode('","', array_reverse($names)) . '"]}';
             $holderID = 'chart_' . $pid;
-            $h = count($props)*30;
-            $h = ($h < MIN_CHART_HEIGHT) ? MIN_CHART_HEIGHT : $h;
-            echo '</table><div class="chartholder" id="' . $holderID . '" style="height: ' . $h . 'px;"></div>';
+            echo '</table><div class="chartholder" id="' . $holderID . '" style="height: ' .
+                 calc_row_height($mainData, count($props)) . 'px;"></div>';
         }
         echo "</section>\n"; // end of div #result
         echo '<script> var Profiles = [' . implode(',', $createProfileStrings) . ']; </script>';

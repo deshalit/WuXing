@@ -52,6 +52,8 @@ function analyze_params(Dictionary $dict, RequestData $data, $input)
 
 if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     analyze_params($dictionary, $mainData, $_POST);
+    //var_dump($mainData);
+    //exit;
 }
 
 
