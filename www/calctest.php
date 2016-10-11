@@ -11,7 +11,6 @@ const H_KOEF_2 = 50;
         }
         return ($h < MIN_CHART_HEIGHT) ? MIN_CHART_HEIGHT : $h;
     }
-
     function fill_client_form_data(ClientData $client, $no) {
         echo    
              'document.getElementById("firstname' . $no . '").value = "' . $client->first_name . '"; ' 
@@ -22,22 +21,6 @@ const H_KOEF_2 = 50;
                  'el = document.getElementById("value_' . $elkey . $no .'"); if (el) { el.disabled = false; el.value = ' . $elvalue . '}; ';
             }    
     }
-
-    function out_data_cells(RequestData $mainData, $profile_id, $property_id) {
-        echo '<td>';
-        if ($property_id) {
-            echo $mainData->client1->profiles[$profile_id][$property_id];  
-            if ($mainData->mode == MODE_TWO) {
-                echo '</td><td>' . $mainData->client2->profiles[$profile_id][$property_id];
-            } 
-        } else {
-            if ($mainData->mode == MODE_TWO) { 
-                echo '</td><td>'; 
-            }           
-        }
-        echo '</td>';
-    }
-    
     function get_data_string(RequestData $mainData, $profile_id) {
         $res = '[' . implode(',', array_reverse( array_values($mainData->client1->profiles[$profile_id]))) . ']';
         if ($mainData->mode == MODE_TWO) {
@@ -46,7 +29,6 @@ const H_KOEF_2 = 50;
             return $res;
         }
     }
-
     function fill_form_data(RequestData $mainData) { 
         echo '<script> $("#mode").prop("value", "' . $mainData->mode . '"); ';
         fill_client_form_data($mainData->client1, 1);
@@ -55,6 +37,39 @@ const H_KOEF_2 = 50;
             echo 'document.getElementById("prof' . $pid . '").checked = true;';
         }    
         echo '</script>';    
+    }
+    function write_data_cells(RequestData $mainData, $profile_id, $property_id) {
+        echo '<td>';
+        if ($property_id) {
+            echo $mainData->client1->profiles[$profile_id][$property_id];  
+            if ($mainData->mode == MODE_TWO) {
+                echo '</td><td>' . $mainData->client2->profiles[$profile_id][$property_id];
+            } 
+        } else {
+            if ($mainData->mode == MODE_TWO) { echo '</td><td>'; }           
+        }
+        echo '</td>';
+    }
+    function write_person_section($no) {
+        echo '        <section id="person' . $no . '">' . "\n" .
+             '          <fieldset class="pers_data">' . "\n" .
+             '            <legend>Персона</legend>' . "\n" .
+             '            <label for="firstname' . $no . '">Имя:</label><br />' . "\n" .
+             '            <input id="firstname' . $no . '" type="text" name="fname' . $no . '" placeholder="Иван" /><br />' . "\n" .
+             '            <label for="lastname">Фамилия:</label><br />' . "\n" .
+             '            <input id="lastname' . $no . '" type="text" name="lname' . $no . '" placeholder="Иванов"/><br />' . "\n" .
+             '            <label for="email' . $no . '">Email:</label><br />' . "\n" .
+             '            <input id="email' . $no . '" type="email" name="email' . $no . '" placeholder="test@test.net"/><br />' . "\n" .
+             '          </fieldset>' . "\n" .
+             '          <fieldset class="pers_data">' . "\n" .
+             '            <legend>Элементы</legend><table id="elems' . $no . '">' . "\n" .
+             '            <label id="wrong_sum' . $no . '" hidden></label><br/>' . "\n";
+        foreach(Dictionary::$elemNames as $key=>$name) {
+            echo '<tr><td><label for="elem_' . $key . $no . '_chk">' . mb_substr($name, 0, 1, 'UTF-8') . '</label></td>' .
+                 '<td><input id="elem_' . $key . $no . '_chk" type="checkbox" onchange="elem_state_changed(' . $no . ', this.id, this.checked)" /></td>' .
+                 '<td><input class="elvalue" id="value_' . $key . $no . '" name="el' . $no . '_' . $key . '" type="number" min="0.0" max="0.95" value="0.5" step="0.05" disabled onchange="elem_value_changed(' . $no . ')"/></td></tr>';
+        } 
+        echo '</table></fieldset></section>';
     }
 ?>
 <!DOCTYPE html>
@@ -70,12 +85,13 @@ const H_KOEF_2 = 50;
         #profiles input[type=checkbox] { margin-top: 10px; }
         #result {float: left; /*margin-right: 30px;*/ padding: 20px 10px;}
         .chartholder { float: left; width: 500px; minwidth: 200px;
-                       minheight: <?=MIN_CHART_HEIGHT?>px; margin: 30px; }
+                       minheight: <?=MIN_CHART_HEIGHT?>px; margin: 0 10px; }
         #result table {float: left; margin: 20px 10px 10px 10px; width: 250px; }
         #wrong_sum1, #wrong_sum2 {color: darkred; font-weight: bold;}
         #elems { margin: 5px 5px; }
         #mode { margin-right: 20px;}
         #btn_submit {float: right; cursor: hand;}
+        .makeimagelink { display: block; text-align: center; }
     </style>
     <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="excanvas.js"></script><![endif]-->
     <script src="jquery.min.js"></script>
@@ -104,7 +120,7 @@ const H_KOEF_2 = 50;
     </script>
     <script>
         function ViewData(data, names, holderID) {
-            console.log(data);
+            //console.log(data);
             $.jqplot(holderID, data, {
                 // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
                 animate: false, //!$.jqplot.use_excanvas,
@@ -166,8 +182,11 @@ const H_KOEF_2 = 50;
         function unselect_all_profs() {
             $('#profiles input[type="checkbox"]').each( function() { this.checked = false } );
         }        
-        function onmodechanged(newvalue) {
-            $('#person2 fieldset').each( function(){this.disabled = (newvalue != 'two')} )
+        function onmodechanged(newValue) {
+            $('#person2 fieldset').each( function(){this.disabled = (newValue != 'two')} )
+        }
+        function makeimage(holderID) {
+           var imgStr = $('#' + holderID).jqplotToImageStr({});
         }
     </script>
 </head>
@@ -182,48 +201,9 @@ const H_KOEF_2 = 50;
                 </select><input type="submit" value="Рассчитать" />
             </section> 
             <section id="person_container">
-                <section id="person1">
-                    <fieldset class="pers_data">
-                        <legend>Персона</legend>
-                        <label for="firstname1">Имя:</label><br />
-                        <input id="firstname1" type="text" name="fname1" placeholder="Иван" /><br />
-                        <label for="lastname">Фамилия:</label><br />
-                        <input id="lastname1" type="text" name="lname1" placeholder="Иванов"/><br />
-                        <label for="email1">Email:</label><br />
-                        <input id="email1" type="email" name="email1" placeholder="test@test.net"/><br />
-                    </fieldset>
-                    <fieldset class="pers_data">
-                        <legend>Элементы</legend><table id="elems1">
-                        <label id="wrong_sum1" hidden></label><br/>
-                        <?php  foreach(Dictionary::$elemNames as $key=>$name) {
-                            echo '<tr><td><label for="elem_' . $key . '1_chk">' . mb_substr($name, 0, 1, 'UTF-8') . '</label></td>' .
-                                '<td><input id="elem_' . $key . '1_chk" type="checkbox" onchange="elem_state_changed(1, this.id, this.checked)" /></td>' .
-                                '<td><input class="elvalue" id="value_' . $key . '1" name="el1_' . $key . '" type="number" min="0.0" max="0.95" value="0.5" step="0.05" disabled onchange="elem_value_changed(1)"/></td></tr>';
-                        } ?>
-                        </table>
-                    </fieldset>
-                </section>   
-                <section id="person2">
-                    <fieldset class="pers_data">
-                        <legend> Персона 2 </legend>
-                        <label for="firstname2">Имя:</label><br />
-                        <input id="firstname2" type="text" name="fname2" placeholder="Иван" /><br />
-                        <label for="lastname2">Фамилия:</label><br />
-                        <input id="lastname2" type="text" name="lname2" placeholder="Иванов"/><br />
-                        <label for="email2">Email:</label><br />
-                        <input id="email2" type="email" name="email2" placeholder="test@test.net"/><br />
-                    </fieldset>
-                    <fieldset class="pers_data">
-                        <legend>Элементы</legend><table id="elems2">
-                        <label id="wrong_sum2" hidden></label><br/>
-                        <?php  foreach(Dictionary::$elemNames as $key=>$name) {
-                            echo '<tr><td><label for="elem_' . $key . '2_chk">' . mb_substr($name, 0, 1, 'UTF-8') . '</label></td>' .
-                                '<td><input id="elem_' . $key . '2_chk" type="checkbox" onchange="elem_state_changed(2, this.id, this.checked)" /></td>' .
-                                '<td><input class="elvalue" id="value_' . $key . '2" name="el2_' . $key . '" type="number" min="0.0" max="0.95" value="0.5" step="0.05" disabled onchange="elem_value_changed(2)"/></td></tr>';
-                        } ?>
-                        </table>
-                    </fieldset>
-                </section>              
+                <?php write_person_section(1);
+                      write_person_section(2); 
+                ?>
             </section>
             <section id="profiles">    
                 <fieldset><legend>Срезы</legend>
@@ -246,7 +226,7 @@ const H_KOEF_2 = 50;
         foreach (array_values($mainData->profiles) as $pid) {
             echo '<div id="profile_' . $pid . '"><table>';
             echo "<tr><td>" . $dictionary->get_profile_name($pid) . '</td>';
-            out_data_cells($mainData, $pid, 0);
+            write_data_cells($mainData, $pid, 0);
             echo "</tr>\n";
             $props = $dictionary->get_profile_properties($pid);            
             $names = Array();
@@ -254,14 +234,14 @@ const H_KOEF_2 = 50;
                 $prop_name = $dictionary->get_property_name($propid);                
                 $names[] = $prop_name;
                 echo "<tr><td>" . $prop_name . "</td>"; // title of property
-                out_data_cells($mainData, $pid, $propid);
+                write_data_cells($mainData, $pid, $propid);
                 echo "</tr>\n";
             }
             $createProfileStrings[] = ' { id: ' . $pid . ', data: [' . get_data_string($mainData, $pid)
                                     . '], names: ["' . implode('","', array_reverse($names)) . '"]}';
             $holderID = 'chart_' . $pid;
-            echo '</table><div class="chartholder" id="' . $holderID . '" style="height: ' .
-                 calc_row_height($mainData, count($props)) . 'px;"></div>';
+            echo '</table><div class="chartholder"><a class="makeimagelink" href="#" onclick="makeimage(' . $holderID . ')">Картинка</a><div id="' . $holderID . '" style="height: ' .
+                 calc_row_height($mainData, count($props)) . 'px;"></div></div>';
         }
         echo "</section>\n"; // end of div #result
         echo '<script> var Profiles = [' . implode(',', $createProfileStrings) . ']; </script>';
