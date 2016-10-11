@@ -63,15 +63,15 @@ const H_KOEF_2 = 50;
     <meta charset="UTF-8">
     <title>Тестируем алгоритм</title>
     <style>
-        #formholder {float: left; margin-left: 50px; padding: 20px 20px;}
+        #formholder {float: left; /*margin-left: 50px;*/ padding: 10px 10px; 10px; 10px;}
         /*.pers_data { float:left; }*/
         #person_container, #person1, #person2 { float: left }
         /*#profiles { float: left; }*/
         #profiles input[type=checkbox] { margin-top: 10px; }
-        #result {float: left; margin-right: 50px; padding: 20px 20px;}
+        #result {float: left; /*margin-right: 30px;*/ padding: 20px 10px;}
         .chartholder { float: left; width: 500px; minwidth: 200px;
                        minheight: <?=MIN_CHART_HEIGHT?>px; margin: 30px; }
-        #result table {float: left; margin: 20px 10px 20px 20px; width: 250px; }
+        #result table {float: left; margin: 20px 10px 10px 10px; width: 250px; }
         #wrong_sum1, #wrong_sum2 {color: darkred; font-weight: bold;}
         #elems { margin: 5px 5px; }
         #mode { margin-right: 20px;}
