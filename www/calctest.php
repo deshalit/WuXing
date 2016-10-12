@@ -91,7 +91,7 @@ const H_KOEF_2 = 50;
         #elems { margin: 5px 5px; }
         #mode { margin-right: 20px;}
         #btn_submit {float: right; cursor: hand;}
-        .makeimagelink { display: block; text-align: center; }
+        .makeimagelink { display: block; text-align: right; }
     </style>
     <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="excanvas.js"></script><![endif]-->
     <script src="jquery.min.js"></script>
@@ -185,14 +185,13 @@ const H_KOEF_2 = 50;
         function onmodechanged(newValue) {
             $('#person2 fieldset').each( function(){this.disabled = (newValue != 'two')} )
         }
-        function makeimage(holderID) {
-           console.log("#" + holderID);
-           var obj = $("#" + holderID)[0];
-           var cr = obj.getClientRects()[0];
-           //var s = obj.jqplotToImageStr({});
-           var initStr = "width=500,height=400,location=0,left="+cr.top+",top="+cr.top;
-           console.log(initStr); 
-           var myWindow = window.open("", "MsgWindow", initStr);
+        function makeimage(no) {
+           var hID = "#chart_" + Profiles[no].id;
+           var cr = $(hID)[0].getClientRects()[0];
+           var dataStr = $(hID).jqplotToImageStr({})
+           var initStr = 'width=' + (cr.width + 50).toString() + ', height=' + (cr.height + 50).toString() + ', left=' + cr.top + ', top=' + cr.top + ', location=no';var titleStr = "Картинка для сохранения: " + Profiles[no].name;           
+           var myWindow = window.open("", titleStr, initStr);
+           myWindow.document.write('<html><head><title>' + titleStr + '</title></head><body><img src="' + dataStr + '"/></body></html>');
         }
     </script>
 </head>
@@ -231,7 +230,8 @@ const H_KOEF_2 = 50;
         echo '<section id="result">' . "\n";
         foreach (array_values($mainData->profiles) as $pid) {
             echo '<div id="profile_' . $pid . '"><table>';
-            echo "<tr><td>" . $dictionary->get_profile_name($pid) . '</td>';
+            $profName = $dictionary->get_profile_name($pid);
+            echo "<tr><td>" . $profName . '</td>';
             write_data_cells($mainData, $pid, 0);
             echo "</tr>\n";
             $props = $dictionary->get_profile_properties($pid);            
@@ -243,11 +243,12 @@ const H_KOEF_2 = 50;
                 write_data_cells($mainData, $pid, $propid);
                 echo "</tr>\n";
             }
-            $createProfileStrings[] = ' { id: ' . $pid . ', data: [' . get_data_string($mainData, $pid)
-                                    . '], names: ["' . implode('","', array_reverse($names)) . '"]}';
+            $profileStr = ' { id: ' . $pid . ', name: "' . $profName . '"' . ', data: [' . get_data_string($mainData, $pid)
+                        . '], names: ["' . implode('","', array_reverse($names)) . '"]}';
+            $i = array_push($createProfileStrings, $profileStr);
             $holderID = 'chart_' . $pid;
-            echo '</table><div class="chartholder"><a class="makeimagelink" href="#" onclick="makeimage(';
-	    echo "'" . $holderID . "'" . ')">Картинка</a><div id="' . $holderID . '" style="height: ' .
+            echo '</table><div class="chartholder"><a class="makeimagelink" href="#" onclick="makeimage(' .
+                ($i-1) . ')">Снимок среза &laquo' . $profName . '&raquo</a><div id="' . $holderID . '" style="height: ' .
                  calc_row_height($mainData, count($props)) . 'px;"></div></div>';
         }
         echo "</section>\n"; // end of div #result
