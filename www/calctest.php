@@ -186,7 +186,13 @@ const H_KOEF_2 = 50;
             $('#person2 fieldset').each( function(){this.disabled = (newValue != 'two')} )
         }
         function makeimage(holderID) {
-           var imgStr = $('#' + holderID).jqplotToImageStr({});
+           console.log("#" + holderID);
+           var obj = $("#" + holderID)[0];
+           var cr = obj.getClientRects()[0];
+           //var s = obj.jqplotToImageStr({});
+           var initStr = "width=500,height=400,location=0,left="+cr.top+",top="+cr.top;
+           console.log(initStr); 
+           var myWindow = window.open("", "MsgWindow", initStr);
         }
     </script>
 </head>
@@ -240,7 +246,8 @@ const H_KOEF_2 = 50;
             $createProfileStrings[] = ' { id: ' . $pid . ', data: [' . get_data_string($mainData, $pid)
                                     . '], names: ["' . implode('","', array_reverse($names)) . '"]}';
             $holderID = 'chart_' . $pid;
-            echo '</table><div class="chartholder"><a class="makeimagelink" href="#" onclick="makeimage(' . $holderID . ')">Картинка</a><div id="' . $holderID . '" style="height: ' .
+            echo '</table><div class="chartholder"><a class="makeimagelink" href="#" onclick="makeimage(';
+	    echo "'" . $holderID . "'" . ')">Картинка</a><div id="' . $holderID . '" style="height: ' .
                  calc_row_height($mainData, count($props)) . 'px;"></div></div>';
         }
         echo "</section>\n"; // end of div #result
