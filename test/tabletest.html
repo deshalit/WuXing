@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+            <head>
+                    <script src="jquery.min.js"></script> <!-- jQuery source -->
+                    <style>
+                      td {maxwidth: 40px}
+                    </style>
+            </head>
+            <body>
+                    <table align="center">
+                            <tr> <td>id</td> <td>name</td> </tr>
+                            <tr> <td>001</td> <td>dog</td> </tr>
+                            <tr> <td>002</td> <td>cat</td> </tr>
+                            <tr> <td>003</td> <td>pig</td> </tr>
+                    </table>
+                    <script>
+   var OriginalContent = "";
+function Commit(sender) {
+var newContent = sender.val();
+                sender.parent().text(newContent);
+                sender.parent().removeClass("cellEditing");   
+}
+function Rollback(sender) {
+	sender.parent().text(OriginalContent);
+  sender.parent().removeClass("cellEditing");
+}
+$(function () {
+    $("td").dblclick(function () {
+        OriginalContent = $(this).text();
+        w = $(this).width();
+        $(this).addClass("cellEditing");
+        $(this).html("<input type='text' value='" + OriginalContent + "' />");
+        inp = $(this).children().first();
+        inp.css({width: w});
+        inp.focus();
+        inp.keyup(function (e) {
+            if (e.which == 13) {
+                Commit($(this));
+            } else 
+              if (e.which == 27) {
+								Rollback($(this));
+              }
+        });
+    inp.blur(function(){
+        Rollback(inp);
+    });
+        $(this).find('input').dblclick(function(e){
+            e.stopPropagation(); 
+        });
+    });
+});
+                    </script>
+            </body>
+    </html>
