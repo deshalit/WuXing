@@ -722,7 +722,6 @@ function buildProfiles(Dictionary $dictionary) {
             <ul><?=buildProfiles($dictionary);?></ul>
         </section>
         <textarea id="note" name="<?=PARAM_ORDER_NOTE?>" rows="5" placeholder="Ваши пожелания" ></textarea>
-        <label id="cost">Стоимость услуги:<span class="param">100<span>грн</label>
         <section id="promocode">
           <label for="promo">Для получения скидки введите номер Вашего купона:</label>
           <input id="promo" name="<?=PARAM_ORDER_PROMOCODE?>" size="5" pattern="[0-9]{5,5}" maxlength=5 placeholder="пять цифр"/>
