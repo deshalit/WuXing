@@ -1,0 +1,10 @@
+body {
+       max-width: 900px;
+       width: 70%;
+       margin: auto;  
+       font-size: large; 
+       background-color: rgb(231, 233, 235);    
+}  
+a {
+    font-weight: bold;
+}

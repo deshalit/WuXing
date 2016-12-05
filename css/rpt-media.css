@@ -1,0 +1,19 @@
+@media screen and (max-width: 1000px) {
+    .comm {
+        font-size: small;
+    }
+}
+@media screen and (max-width: 850px) {
+    .comm {
+        float: left;
+        font-size: medium;
+    }
+}
+@media screen and (max-width: 600px) {
+    .comm p {
+        font-size: medium;
+    }
+    #risk section {
+        width: 100%;
+    }
+}

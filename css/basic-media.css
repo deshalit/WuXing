@@ -1,0 +1,14 @@
+@media screen and (max-width: 800px) {
+    body {
+            width: 100%;
+            font-size: medium; 
+    }
+}
+@media screen and (max-width: 600px) {
+    body {
+        font-size: small; 
+    }
+    p,li {
+        font-size: small;
+    }
+}

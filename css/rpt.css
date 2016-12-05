@@ -1,0 +1,111 @@
+body {
+    background-color: rgb(244, 244, 244);
+}
+h2 {
+  text-transform: uppercase;  
+  font-family: "Arial";
+  font-size: large;
+} 
+ul {
+    list-style-type: none;
+    line-height: 2.0;
+    padding-left: 0;
+    float: left;
+    width: 50%;
+}    
+li {
+    font-family: "Arial";
+    font-size: large;
+}    
+#clinfo {
+    margin-top: 4.0%;
+    padding-left: 8px;    
+}  
+.br {
+    clear: both;
+}  
+.chartholder {
+    float: left;
+}    
+.chartholder {
+    width: 450px;
+    min-width: 200px;
+    min-height: 200px;
+}   
+.comm {
+    font-size: medium;
+    font-family: "Arial";
+    color: rgb(61, 61, 61);
+    line-height: 1.2;
+    overflow: hidden;
+    padding: 10px;
+    float: none;
+}
+h4 {
+    font-size: medium;
+    font-family: "Arial";
+    color: rgb(61, 61, 61);
+    line-height: 1.2;
+    text-align: left;
+    margin-top: 0;
+}
+    
+#note {
+    float: left;
+    width: 50%;
+}    
+ 
+#note p {
+    font-size: medium;
+    font-family: "Arial";
+    color: rgb(61, 61, 61);
+    font-style: italic;
+    line-height: 1.2;
+    text-align: left;
+}
+
+}    
+hr {
+    clear: both;   
+}    
+h3 {
+    font-size: large;
+    font-family: "Arial";
+    color: rgb(61, 61, 61);
+    font-weight: bold;
+    text-transform: uppercase;
+    line-height: 1.2;
+}
+#risk {
+    margin-top: 5%;
+}
+#risk p {
+  font-size: medium;
+  font-family: "Arial";
+  color: rgb(61, 61, 61);
+  line-height: 1.2;
+  text-align: justify;
+}    
+#risk section {
+    width: 50%;
+    display: inline-block;  
+    vertical-align: top;
+    box-sizing: border-box;
+    padding: 1%;
+}
+#risk section.odd {
+    width: 100%;
+}
+footer {
+  font-size: large;
+  font-family: "Arial";
+  color: rgb(61, 61, 61);
+  font-style: italic;
+  line-height: 1.2;
+  text-align: left;
+  height: 38px;
+}
+.value {
+    font-style: italic;
+    padding: 0 5px;
+}    
