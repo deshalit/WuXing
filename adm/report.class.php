@@ -56,6 +56,32 @@ class Report
         }
         return $res;
     }
+    public function getPrevailMask(){
+        $res = 0;
+        if (is_array($this->elems)) {
+            $elems = array();
+            $firstId = 0;
+            $secondId = 0;
+            $mostValue = 0.0;
+            foreach ($this->elems as $eid=>$value) {
+                if ($value > $mostValue) {
+                    $mostValue = $value;
+                    $firstId = $eid;
+                }        
+            }
+            $mostValue = 0.0;
+            foreach ($this->elems as $eid=>$value) {
+                if ($eid === $firstId) continue; 
+                if ($value > $mostValue) {
+                    $mostValue = $value;
+                    $secondId = $eid;
+                }        
+            } 
+            array_push($elems, $firstId, $secondId);
+            $res =  Dictionary::get_elem_hash($elems);
+        }
+        return $res;
+    }
     public function hasExtraText() {
         return (is_array($this->xComments) and count($this->xComments) > 0) or
                (is_array($this->xRisk) and count($this->xRisk) > 0);

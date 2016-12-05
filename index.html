@@ -2,71 +2,11 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>OnLine сервис диагностики потенциала человека</title>
+    <link href="css/basic.css" rel="stylesheet" type="text/css" />
+    <link href="css/header.css" rel="stylesheet" type="text/css" />
     <style>
-        body {
-           max-width: 900px;
-           width: 70%;
-           margin: auto;  
-           font-size: large; 
-           background-color: rgb(231, 233, 235);    
-        }      
-        
-        .headblock {
-          font-family: "Arial";
-          color: white;
-          background-color: rgb(107, 156, 119);
-        }
-        header.headblock {
-            /*height: 60px;*/
-            border-style: solid;
-            border-color: #6b9c77;
-            position: relative;
-            justify-content: space-around;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-        }
-        header.headblock > img {
-          padding: 5px 0;
-        }
-        h1 {
-            font-size: large;
-            text-align: center;
-            padding-right: 5%;
-            flex: 2 1 0;
-            
-        }   
-        #imgwrap {
-            margin-right: 2%;
-            margin-left: 2%;
-        }    
-        a.headblock:last-child {
-            font-size: small;
-            margin-right: 2%;
-            margin-left: 2%;
-        }   
-        @media screen and (max-width: 800px) {
-            body {
-                    width: 100%;
-                    font-size: medium; 
-            }
-            h1 {
-                font-size: medium;
-            }
-        }
-        @media screen and (max-width: 500px) {
-            body {
-                    font-size: small; 
-            }
-            h1 {
-                font-size: small;
-                
-            }
-            header.headblock > img {
-              display: none;
-            }
-        }
         p,li {
            text-align: justify;  
            font-size: 16px;
@@ -75,9 +15,6 @@
         }    
         li {
            margin: 10px 50px 0 0;
-        }
-        a {
-            font-weight: bold;
         }
         #attention {
                 margin: 40px 70px; 
@@ -172,6 +109,27 @@
                 color: white;
                 float: right;
                 margin-right: 50px;
+        }
+        @media screen and (max-width: 500px) {
+            body {
+                    font-size: small; 
+            }
+            h1 {
+                font-size: small;
+                
+            }
+            header.headblock > img {
+              display: none;
+            }
+        }
+        @media screen and (max-width: 800px) {
+            body {
+                    width: 100%;
+                    font-size: medium; 
+            }
+            h1 {
+                font-size: medium;
+            }
         }
     </style>
  </head>

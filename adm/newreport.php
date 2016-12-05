@@ -224,7 +224,9 @@ $reportBuilder->analyzeParams();
             cursor: hand;
             margin-top: 10px; font-size: large; color: #666666; display: inline-block;
         }
-        #userpagelink { display: none }
+        #mainform {
+            display: none;
+        } 
     </style>
     <script src="../lib/jquery.min.js"></script>
     <script src="../lib/jqplot/jquery.jqplot.min.js"></script>
@@ -363,7 +365,7 @@ $reportBuilder->analyzeParams();
             );
             $('#riskholder tbody').html(s).find('textarea').on('input',
                 function (ev) {
-                    checkTextChanged(Risk, ev.target, newReport.xRisk,
+                    checkTextChanged(Risk, newReport.xRisk, ev.target, 
                         function(rObj) { return getMaskText(rObj, newReport, newReport.xRisk); }
                     )
                 }
@@ -474,9 +476,10 @@ $reportBuilder->analyzeParams();
         }
         function generateChartsAndText() {
             var query = makeCalcQueryParams();
-            var chartData = [];
+            chartData = [];
             $.get('calc.php?' + query, function (answer, status) {
                 if (status == 'success') {
+                    console.log(answer);
                     chartData = JSON.parse(answer);
                     chartData.forEach( function(obj) {
                         //console.log(obj.data[0]);
@@ -486,9 +489,12 @@ $reportBuilder->analyzeParams();
                         p.props.forEach( function (prop) { obj.names.push(prop.name); } );
                         //obj.names.reverse();
                     });
-                    buildTables();
-                    readyCharts(chartData);
-                }
+                    if (chartData && chartData.length > 0) {
+                        $('#output').show();
+                        buildTables();
+                        readyCharts(chartData);
+                    } else $('#output').hide();
+                } else $('#output').hide();
             });
         }    
     </script>
@@ -498,6 +504,7 @@ $reportBuilder->analyzeParams();
             buildProfiles();
             buildRisk();
             buildElements();
+            $('#output').hide();
             ReportDataToControls();
         } );
     </script>
@@ -524,23 +531,52 @@ $reportBuilder->analyzeParams();
             res.<?=Report::PARAM_PROFILES?> = cloneArray(newReport.profiles);
             return res;
         }
+        function generatePostData() {
+            $('#mainform input[name="<?=Report::PARAM_FIRSTNAME?>"]').val(newReport.firstName);
+            $('#mainform input[name="<?=Report::PARAM_LASTNAME?>"]').val(newReport.lastName);
+            $('#mainform input[name="<?=Report::PARAM_EMAIL?>"]').val(newReport.email);
+            $('#mainform input[name="<?=Report::PARAM_ID?>"]').val(newReport.id);
+            $('#mainform input[name^="<?=Report::PARAM_ELEMS?>"]').val('');
+            newReport.elems.forEach( function(el){ 
+                        var elName = "<?=Report::PARAM_ELEMS?>[" + el.id + "]";  
+                        $('#mainform input[name="' + elName + '"]').val(el.data); 
+            });
+            $('#mainform input[name="<?=Report::PARAM_NOTES?>"]').val(newReport.note);
+            $('#mainform input[name="<?=Report::PARAM_ORDERID?>"]').val(newReport.orderId);
+            $('#mainform input[name="<?=Report::PARAM_RISK?>"]').val(newReport.risk.join(","));
+            newReport.xRisk.forEach( function(el){ 
+                        var elName = "<?=Report::PARAM_XRISK?>[" + el.id + "]";  
+                        if ($('#mainform input[name="' + elName + '"]').length == 0) {
+                            $('#mainform').append('<input name="' + elName + '"/>'); 
+                        }
+                        $('#mainform input[name="' + elName + '"]').val(el.data);
+            });
+            newReport.xComments.forEach( function(el){ 
+                        var elName = "<?=Report::PARAM_XCOMMENTS?>[" + el.id + "]";  
+                        if ($('#mainform input[name="' + elName + '"]').length == 0) {
+                            $('#mainform').append('<input name="' + elName + '"/>'); 
+                        }
+                        $('#mainform input[name="' + elName + '"]').val(el.data);
+            });
+            $('#mainform input[name="<?=Report::PARAM_PROFILES?>"]').val(newReport.profiles.join(","));
+        }
         function openUserPage() {
             controlsToReportData();
+            generatePostData();
+            $('#mainform').submit();
+/*
             var postObj = generatePostObject({});
             console.log(postObj);
             $.post('savereport.php', postObj,
                 function(data, status){
                     if (status == 'success') {
                         console.log(data);
-                        location.assign('orders.php');
-                        /*
-                        var newId = parseInt(data);
-                        Report.id = newId;
-                        $('#userpagelink').prop('href', 'report.php?id=' + newId).click();
-                        */
+                        //location.assign('orders.php');
+                        
                     }
                 }
             );
+*/
         }
     </script>
 </head>
@@ -568,11 +604,25 @@ $reportBuilder->analyzeParams();
         <label for="usernotes">Клиентские</label>
         <textarea id="usernotes" readonly></textarea>
     </fieldset>
-    <button class="bigbutton" onclick="controlsToReportData(); generateChartsAndText(newReport)">Рассчитать</button>
-    <a id="userpagelink" target="_blank" href="report.php"></a>
-    <button class="bigbutton" onclick="openUserPage()">Сохранить</button>
+    <button class="bigbutton" onclick="controlsToReportData(); generateChartsAndText(newReport)">Рассчитать</button>    
 </section>
 <section id="output">
+    <form id="mainform" action="savereport.php" method="POST">
+        <input name="<?=Report::PARAM_FIRSTNAME?>" />
+        <input name="<?=Report::PARAM_LASTNAME?>" />
+        <input name="<?=Report::PARAM_EMAIL?>" />
+        <input name="<?=Report::PARAM_ID?>" />
+        <input name="<?=Report::PARAM_NOTES?>" />
+        <input name="<?=Report::PARAM_ORDERID?>" />
+        <input name="<?=Report::PARAM_PROFILES?>" />
+        <input name="<?=Report::PARAM_RISK?>" />
+<?php
+        foreach(array_keys(Dictionary::$elemNames) as $id) {
+            echo '<input name="' . Report::PARAM_ELEMS . '[' . $id . ']">';        
+        }
+?>
+    </form> 
+    <div><button class="bigbutton" onclick="openUserPage()">Сохранить</button></div>
     <fieldset><legend>Результаты расчета</legend>
         <table id="profileholder">
             <thead>

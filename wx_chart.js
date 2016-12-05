@@ -6,7 +6,7 @@ const MIN_CHART_HEIGHT = 200;
 function initPlot(data, names, holderID) {
     $.jqplot(holderID, data, {
         // Only animate if we're not using excanvas (not in IE 7 or IE 8)..
-        animate: false, //!$.jqplot.use_excanvas,
+        animate: !$.jqplot.use_excanvas,
         canvasOverlay: {show: true},
         seriesDefaults:{
             renderer: $.jqplot.BarRenderer,
@@ -30,7 +30,7 @@ function initPlot(data, names, holderID) {
 }
 
 function calcRowHeight(dataArray, subjCount = 1)
-{
+{   
     if (subjCount > 1) {
         //var h = $propCount * self::H_KOEF_2;
     } else {
@@ -54,6 +54,7 @@ function readyCharts(ProfileArray) {
             function (ev, seriesIndex, pointIndex, data) {
                 $("#info1").html("series: " + seriesIndex + ", point: " + pointIndex + ", data: " + data);
             } );
+        //console.log(ProfileArray[i].data);    
         initPlot(ProfileArray[i].data, ProfileArray[i].names, holderID);
     }
 }
