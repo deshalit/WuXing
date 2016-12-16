@@ -1,6 +1,6 @@
 <?php
 
-require_once("dict.class.php");
+require_once("dictionary.class.php");
 
 const S_EXCEPTION_FILE_NOT_EXISTS = 'File does not exist';
 const S_EXCEPTION_FILE_CORRUPTED = 'File is corrupted or locked';

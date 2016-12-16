@@ -1,5 +1,11 @@
+html {
+    background-color: #e7e9eb;
+}    
 body {
     background-color: rgb(244, 244, 244);
+}
+#chart, #risk, footer {
+  padding-left: 10px;
 }
 h2 {
   text-transform: uppercase;  
@@ -103,7 +109,6 @@ footer {
   font-style: italic;
   line-height: 1.2;
   text-align: left;
-  height: 38px;
 }
 .value {
     font-style: italic;

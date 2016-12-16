@@ -1,9 +1,12 @@
+html {
+      background-color: rgb(231, 233, 235);    
+}
 body {
        max-width: 900px;
        width: 70%;
        margin: auto;  
        font-size: large; 
-       background-color: rgb(231, 233, 235);    
+       background-color: rgb(244, 244, 244);
 }  
 a {
     font-weight: bold;
